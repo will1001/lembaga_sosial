@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => {
     const isCurrentPath = location.pathname === path;
     if (isCurrentPath) return "text-yellow-500 font-medium";
-    if (isHomePage && !scrolled) return "text-white hover:text-yellow-500";
+    if (isHomePage && !scrolled) return "text-black hover:text-yellow-500";
     return "text-gray-800 hover:text-yellow-500";
   };
 
@@ -51,7 +51,15 @@ const Navbar: React.FC = () => {
             className="flex items-center space-x-2"
             onClick={closeMenu}
           >
-            <Logo color={scrolled ? "black" : "white"} />
+            <Logo
+              color={
+                scrolled
+                  ? "black"
+                  : location.pathname !== "/"
+                  ? "black"
+                  : "white"
+              }
+            />
             <span
               className={`text-lg md:text-xl font-semibold ${
                 isHomePage && !scrolled ? "text-white" : "text-gray-800"
@@ -135,9 +143,9 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white mt-4 rounded-lg shadow-lg overflow-hidden"
+            className="md:hidden bg-white text-black mt-4 rounded-lg shadow-lg overflow-hidden"
           >
-            <div className="flex flex-col py-4">
+            <div className="flex flex-col text-black py-4">
               <Link
                 to="/"
                 className={`px-4 py-3 ${isActive("/")}`}
@@ -147,7 +155,7 @@ const Navbar: React.FC = () => {
               </Link>
               <Link
                 to="/tentang-kami"
-                className={`px-4 py-3 ${isActive("/tentang-kami")}`}
+                className={`px-4 py-3  ${isActive("/tentang-kami")}`}
                 onClick={closeMenu}
               >
                 Tentang Kami
