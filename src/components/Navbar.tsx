@@ -34,7 +34,8 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => {
     const isCurrentPath = location.pathname === path;
     if (isCurrentPath) return "text-yellow-500 font-medium";
-    if (isHomePage && !scrolled) return "text-black hover:text-yellow-500";
+    if (isHomePage && !scrolled && isMenuOpen) return "text-black hover:text-yellow-500";
+    if (isHomePage && !scrolled) return "text-white hover:text-yellow-500";
     return "text-gray-800 hover:text-yellow-500";
   };
 
