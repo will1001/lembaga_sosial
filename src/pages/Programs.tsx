@@ -1,14 +1,32 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { BookOpen, Heart, Users, GraduationCap, Landmark, Leaf, Clock } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { sanity, urlFor } from "../sanityClient";
+
+import { motion } from "framer-motion";
+import {
+  BookOpen,
+  Heart,
+  Users,
+  GraduationCap,
+  Landmark,
+  Leaf,
+  Clock,
+} from "lucide-react";
 
 const Programs: React.FC = () => {
+  const [program, setProgram] = useState();
+  useEffect(() => {
+    sanity.fetch(`*[_type == "program"]`).then((data) => {
+      if (data && data.length > 0) {
+        setProgram(data); // Ambil yang pertama
+      }
+    });
+  }, []);
   return (
     <div className="pt-24">
       {/* Header */}
       <section className="py-16 bg-gradient-to-r from-yellow-500 to-yellow-400">
         <div className="container mx-auto px-4 text-center">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -16,13 +34,14 @@ const Programs: React.FC = () => {
           >
             Program Kami
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-lg text-white max-w-3xl mx-auto"
           >
-            Berbagai inisiatif yang kami kembangkan untuk membawa perubahan positif dan meningkatkan kualitas hidup masyarakat Indonesia.
+            Berbagai inisiatif yang kami kembangkan untuk membawa perubahan
+            positif dan meningkatkan kualitas hidup masyarakat Indonesia.
           </motion.p>
         </div>
       </section>
@@ -31,47 +50,49 @@ const Programs: React.FC = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Program <span className="text-yellow-500">Unggulan</span></h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Program <span className="text-yellow-500">Unggulan</span>
+            </h2>
             <p className="text-gray-700 max-w-2xl mx-auto">
-              Kami fokus pada tiga pilar utama: pendidikan, pemberdayaan ekonomi, dan kesehatan masyarakat. Melalui program-program ini, kami berupaya menciptakan dampak yang berkelanjutan.
+              Kami fokus pada tiga pilar utama: pendidikan, pemberdayaan
+              ekonomi, dan kesehatan masyarakat. Melalui program-program ini,
+              kami berupaya menciptakan dampak yang berkelanjutan.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Program Category 1 */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-lg shadow-lg overflow-hidden"
-            >
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src="https://images.pexels.com/photos/8423276/pexels-photo-8423276.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-                  alt="Program Pendidikan"
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                />
-              </div>
-              <div className="p-6">
-                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4">
-                  <GraduationCap size={24} className="text-white" />
+            {program?.map((item, index) => (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-lg shadow-lg overflow-hidden"
+              >
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={urlFor(item?.image).url()}
+                    alt="Program Pendidikan"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
                 </div>
-                <h3 className="text-xl font-bold mb-3">Pendidikan</h3>
-                <p className="text-gray-700 mb-4">
-                  Menyediakan akses pendidikan berkualitas melalui beasiswa, pengembangan fasilitas, dan pelatihan untuk guru.
-                </p>
-                <a 
-                  href="#pendidikan"
-                  className="inline-flex items-center text-yellow-500 hover:text-yellow-600 font-medium"
-                >
-                  Lihat Program
-                </a>
-              </div>
-            </motion.div>
+                <div className="p-6">
+                  <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4">
+                    <GraduationCap size={24} className="text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{item?.category}</h3>
+                  <p className="text-gray-700 mb-4">{item?.desc}</p>
+                  <a
+                    href="#pendidikan"
+                    className="inline-flex items-center text-yellow-500 hover:text-yellow-600 font-medium"
+                  >
+                    Lihat Program
+                  </a>
+                </div>
+              </motion.div>
+            ))}
 
-            {/* Program Category 2 */}
-            <motion.div 
+            {/* <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -102,7 +123,6 @@ const Programs: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Program Category 3 */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -132,7 +152,7 @@ const Programs: React.FC = () => {
                   Lihat Program
                 </a>
               </div>
-            </motion.div>
+            </motion.div> */}
           </div>
         </div>
       </section>
@@ -145,14 +165,18 @@ const Programs: React.FC = () => {
               <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mb-6 mx-auto md:mx-0">
                 <GraduationCap size={36} className="text-white" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">Program <span className="text-yellow-500">Pendidikan</span></h2>
+              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">
+                Program <span className="text-yellow-500">Pendidikan</span>
+              </h2>
               <p className="text-gray-700 text-center md:text-left">
-                Kami percaya pendidikan adalah kunci untuk memutus rantai kemiskinan dan membuka pintu kesempatan bagi masa depan yang lebih baik.
+                Kami percaya pendidikan adalah kunci untuk memutus rantai
+                kemiskinan dan membuka pintu kesempatan bagi masa depan yang
+                lebih baik.
               </p>
             </div>
             <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Program 1 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -161,7 +185,9 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Beasiswa Cahaya Ilmu</h3>
                 <p className="text-gray-700 mb-4">
-                  Program beasiswa untuk siswa berprestasi dari keluarga kurang mampu di tingkat SD hingga perguruan tinggi, mencakup biaya pendidikan dan tunjangan bulanan.
+                  Program beasiswa untuk siswa berprestasi dari keluarga kurang
+                  mampu di tingkat SD hingga perguruan tinggi, mencakup biaya
+                  pendidikan dan tunjangan bulanan.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>500+ Penerima</span>
@@ -170,7 +196,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 2 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -179,7 +205,9 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Sekolah Untuk Semua</h3>
                 <p className="text-gray-700 mb-4">
-                  Pembangunan dan renovasi fasilitas pendidikan di daerah terpencil, termasuk perpustakaan, laboratorium, dan fasilitas sanitasi.
+                  Pembangunan dan renovasi fasilitas pendidikan di daerah
+                  terpencil, termasuk perpustakaan, laboratorium, dan fasilitas
+                  sanitasi.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>25+ Sekolah</span>
@@ -188,16 +216,20 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 3 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
                 viewport={{ once: true }}
                 className="bg-white rounded-lg shadow-lg p-6"
               >
-                <h3 className="text-xl font-bold mb-3">Pelatihan Guru Inspiratif</h3>
+                <h3 className="text-xl font-bold mb-3">
+                  Pelatihan Guru Inspiratif
+                </h3>
                 <p className="text-gray-700 mb-4">
-                  Program pelatihan untuk meningkatkan kualitas dan kapasitas guru di daerah tertinggal dengan metode pengajaran yang inovatif dan kreatif.
+                  Program pelatihan untuk meningkatkan kualitas dan kapasitas
+                  guru di daerah tertinggal dengan metode pengajaran yang
+                  inovatif dan kreatif.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>300+ Guru</span>
@@ -206,7 +238,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 4 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
@@ -215,7 +247,9 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Perpustakaan Digital</h3>
                 <p className="text-gray-700 mb-4">
-                  Penyediaan akses digital ke berbagai materi pembelajaran melalui komputer dan internet di daerah yang minim akses informasi.
+                  Penyediaan akses digital ke berbagai materi pembelajaran
+                  melalui komputer dan internet di daerah yang minim akses
+                  informasi.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>15+ Lokasi</span>
@@ -235,14 +269,17 @@ const Programs: React.FC = () => {
               <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mb-6 mx-auto md:mx-0">
                 <Landmark size={36} className="text-white" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">Pemberdayaan <span className="text-yellow-500">Ekonomi</span></h2>
+              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">
+                Pemberdayaan <span className="text-yellow-500">Ekonomi</span>
+              </h2>
               <p className="text-gray-700 text-center md:text-left">
-                Membantu masyarakat membangun kemandirian ekonomi melalui pengembangan keterampilan dan usaha yang berkelanjutan.
+                Membantu masyarakat membangun kemandirian ekonomi melalui
+                pengembangan keterampilan dan usaha yang berkelanjutan.
               </p>
             </div>
             <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Program 1 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -251,7 +288,9 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Wirausaha Mandiri</h3>
                 <p className="text-gray-700 mb-4">
-                  Pelatihan kewirausahaan, pemberian modal awal, dan pendampingan usaha untuk keluarga prasejahtera agar dapat memulai usaha kecil.
+                  Pelatihan kewirausahaan, pemberian modal awal, dan
+                  pendampingan usaha untuk keluarga prasejahtera agar dapat
+                  memulai usaha kecil.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>250+ Peserta</span>
@@ -260,7 +299,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 2 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -269,7 +308,8 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Koperasi Desa</h3>
                 <p className="text-gray-700 mb-4">
-                  Pembentukan dan pendampingan koperasi di tingkat desa untuk memfasilitasi akses keuangan dan pemasaran produk lokal.
+                  Pembentukan dan pendampingan koperasi di tingkat desa untuk
+                  memfasilitasi akses keuangan dan pemasaran produk lokal.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>15+ Koperasi</span>
@@ -278,16 +318,19 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 3 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
                 viewport={{ once: true }}
                 className="bg-white rounded-lg shadow-lg p-6"
               >
-                <h3 className="text-xl font-bold mb-3">Pelatihan Keterampilan</h3>
+                <h3 className="text-xl font-bold mb-3">
+                  Pelatihan Keterampilan
+                </h3>
                 <p className="text-gray-700 mb-4">
-                  Program pelatihan berbagai keterampilan praktis seperti menjahit, memasak, kerajinan tangan, dan perbaikan elektronik.
+                  Program pelatihan berbagai keterampilan praktis seperti
+                  menjahit, memasak, kerajinan tangan, dan perbaikan elektronik.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>10+ Jenis Pelatihan</span>
@@ -296,7 +339,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 4 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
@@ -305,7 +348,8 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Digital Marketing</h3>
                 <p className="text-gray-700 mb-4">
-                  Pelatihan pemasaran digital untuk pelaku UMKM agar dapat memperluas jangkauan pasar melalui platform online.
+                  Pelatihan pemasaran digital untuk pelaku UMKM agar dapat
+                  memperluas jangkauan pasar melalui platform online.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>200+ UMKM</span>
@@ -325,14 +369,17 @@ const Programs: React.FC = () => {
               <div className="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mb-6 mx-auto md:mx-0">
                 <Heart size={36} className="text-white" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">Kesehatan <span className="text-yellow-500">Masyarakat</span></h2>
+              <h2 className="text-3xl font-bold mb-4 text-center md:text-left">
+                Kesehatan <span className="text-yellow-500">Masyarakat</span>
+              </h2>
               <p className="text-gray-700 text-center md:text-left">
-                Meningkatkan akses terhadap layanan kesehatan dasar dan edukasi tentang pola hidup sehat di masyarakat.
+                Meningkatkan akses terhadap layanan kesehatan dasar dan edukasi
+                tentang pola hidup sehat di masyarakat.
               </p>
             </div>
             <div className="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Program 1 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -341,7 +388,9 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Klinik Keliling</h3>
                 <p className="text-gray-700 mb-4">
-                  Layanan kesehatan bergerak yang menjangkau daerah terpencil dengan fasilitas terbatas untuk pemeriksaan dan pengobatan dasar.
+                  Layanan kesehatan bergerak yang menjangkau daerah terpencil
+                  dengan fasilitas terbatas untuk pemeriksaan dan pengobatan
+                  dasar.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>30+ Desa</span>
@@ -350,7 +399,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 2 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -359,7 +408,8 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Sanitasi Bersih</h3>
                 <p className="text-gray-700 mb-4">
-                  Pembangunan fasilitas air bersih dan sanitasi di daerah yang minim akses, serta edukasi tentang pola hidup bersih.
+                  Pembangunan fasilitas air bersih dan sanitasi di daerah yang
+                  minim akses, serta edukasi tentang pola hidup bersih.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>20+ Fasilitas</span>
@@ -368,7 +418,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 3 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
@@ -377,7 +427,8 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Posyandu Mandiri</h3>
                 <p className="text-gray-700 mb-4">
-                  Pengembangan kapasitas kader posyandu dan peningkatan fasilitas untuk monitoring gizi dan kesehatan ibu dan anak.
+                  Pengembangan kapasitas kader posyandu dan peningkatan
+                  fasilitas untuk monitoring gizi dan kesehatan ibu dan anak.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>25+ Posyandu</span>
@@ -386,7 +437,7 @@ const Programs: React.FC = () => {
               </motion.div>
 
               {/* Program 4 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
@@ -395,7 +446,8 @@ const Programs: React.FC = () => {
               >
                 <h3 className="text-xl font-bold mb-3">Edukasi Kesehatan</h3>
                 <p className="text-gray-700 mb-4">
-                  Program penyuluhan dan edukasi tentang berbagai isu kesehatan seperti gizi, kesehatan reproduksi, dan pencegahan penyakit.
+                  Program penyuluhan dan edukasi tentang berbagai isu kesehatan
+                  seperti gizi, kesehatan reproduksi, dan pencegahan penyakit.
                 </p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>50+ Sesi</span>
@@ -411,15 +463,18 @@ const Programs: React.FC = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Program <span className="text-yellow-500">Mendatang</span></h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Program <span className="text-yellow-500">Mendatang</span>
+            </h2>
             <p className="text-gray-700 max-w-2xl mx-auto">
-              Berbagai inisiatif baru yang sedang kami kembangkan untuk memperluas dampak dan menjangkau lebih banyak masyarakat.
+              Berbagai inisiatif baru yang sedang kami kembangkan untuk
+              memperluas dampak dan menjangkau lebih banyak masyarakat.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Upcoming Program 1 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -428,16 +483,20 @@ const Programs: React.FC = () => {
             >
               <div className="flex items-center mb-4">
                 <Clock size={20} className="text-yellow-500 mr-2" />
-                <span className="text-sm text-yellow-500 font-medium">Segera Diluncurkan</span>
+                <span className="text-sm text-yellow-500 font-medium">
+                  Segera Diluncurkan
+                </span>
               </div>
               <h3 className="text-xl font-bold mb-3">Taman Baca Digital</h3>
               <p className="text-gray-700">
-                Program perpustakaan digital yang akan menyediakan akses e-book dan materi pendidikan online untuk anak-anak di daerah terpencil.
+                Program perpustakaan digital yang akan menyediakan akses e-book
+                dan materi pendidikan online untuk anak-anak di daerah
+                terpencil.
               </p>
             </motion.div>
 
             {/* Upcoming Program 2 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -446,16 +505,21 @@ const Programs: React.FC = () => {
             >
               <div className="flex items-center mb-4">
                 <Clock size={20} className="text-yellow-500 mr-2" />
-                <span className="text-sm text-yellow-500 font-medium">Dalam Pengembangan</span>
+                <span className="text-sm text-yellow-500 font-medium">
+                  Dalam Pengembangan
+                </span>
               </div>
-              <h3 className="text-xl font-bold mb-3">Pertanian Berkelanjutan</h3>
+              <h3 className="text-xl font-bold mb-3">
+                Pertanian Berkelanjutan
+              </h3>
               <p className="text-gray-700">
-                Program pelatihan dan pendampingan untuk petani dalam mengadopsi teknik pertanian yang ramah lingkungan dan berkelanjutan.
+                Program pelatihan dan pendampingan untuk petani dalam mengadopsi
+                teknik pertanian yang ramah lingkungan dan berkelanjutan.
               </p>
             </motion.div>
 
             {/* Upcoming Program 3 */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -464,11 +528,17 @@ const Programs: React.FC = () => {
             >
               <div className="flex items-center mb-4">
                 <Clock size={20} className="text-yellow-500 mr-2" />
-                <span className="text-sm text-yellow-500 font-medium">Perencanaan Awal</span>
+                <span className="text-sm text-yellow-500 font-medium">
+                  Perencanaan Awal
+                </span>
               </div>
-              <h3 className="text-xl font-bold mb-3">Kursus Coding Untuk Remaja</h3>
+              <h3 className="text-xl font-bold mb-3">
+                Kursus Coding Untuk Remaja
+              </h3>
               <p className="text-gray-700">
-                Program pelatihan pemrograman komputer untuk remaja dari keluarga prasejahtera guna mempersiapkan mereka menghadapi era digital.
+                Program pelatihan pemrograman komputer untuk remaja dari
+                keluarga prasejahtera guna mempersiapkan mereka menghadapi era
+                digital.
               </p>
             </motion.div>
           </div>
@@ -488,16 +558,17 @@ const Programs: React.FC = () => {
               Dukung Program Kami
             </h2>
             <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
-              Bantu kami mewujudkan program-program ini dengan menjadi donatur atau relawan. Setiap kontribusi Anda sangat berarti.
+              Bantu kami mewujudkan program-program ini dengan menjadi donatur
+              atau relawan. Setiap kontribusi Anda sangat berarti.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a 
+              <a
                 href="/donasi"
                 className="bg-white hover:bg-gray-100 text-yellow-500 px-8 py-3 rounded-md text-lg font-medium transition-colors duration-300 flex items-center justify-center"
               >
                 <Heart size={20} className="mr-2" /> Donasi Sekarang
               </a>
-              <a 
+              <a
                 href="/kontak"
                 className="bg-transparent hover:bg-yellow-600 text-white border-2 border-white px-8 py-3 rounded-md text-lg font-medium transition-colors duration-300 flex items-center justify-center"
               >

@@ -102,14 +102,14 @@ const Navbar: React.FC = () => {
             >
               Galeri
             </Link>
-            <Link
+            {/* <Link
               to="/berita"
               className={`${isActive(
                 "/berita"
               )} transition-colors duration-300`}
             >
               Berita
-            </Link>
+            </Link> */}
             <Link
               to="/kontak"
               className={`${isActive(

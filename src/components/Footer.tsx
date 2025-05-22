@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from 'react'
+import { sanity } from '../sanityClient'
 import { Link } from "react-router-dom";
 import {
   MapPin,
@@ -12,10 +13,19 @@ import {
 import Logo from "./Logo";
 
 const Footer: React.FC = () => {
+   const [contact, setContact] = useState();
+  
+    useEffect(() => {
+      sanity.fetch(`*[_type == "contact_profile"]`).then((data) => {
+        if (data && data.length > 0) {
+          setContact(data[0]); // Ambil yang pertama
+        }
+      });
+    }, []);
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* About */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
@@ -60,16 +70,16 @@ const Footer: React.FC = () => {
                   className="text-yellow-500 mt-1 flex-shrink-0"
                 />
                 <p className="text-gray-300">
-                  Jl. Harapan Baru No. 123, Jakarta Selatan, DKI Jakarta
+                  {contact?.address}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone size={18} className="text-yellow-500 flex-shrink-0" />
-                <p className="text-gray-300">+62 812 3456 7890</p>
+                <p className="text-gray-300">{contact?.phone}</p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={18} className="text-yellow-500 flex-shrink-0" />
-                <p className="text-gray-300">info@cahayauntuknegeri.org</p>
+                <p className="text-gray-300">{contact?.email}</p>
               </div>
             </div>
           </div>
@@ -112,14 +122,14 @@ const Footer: React.FC = () => {
                   Galeri
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/berita"
                   className="text-gray-300 hover:text-yellow-500 transition-colors"
                 >
                   Berita
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/kontak"
@@ -132,7 +142,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Newsletter */}
-          <div>
+          {/* <div>
             <h3 className="text-lg font-semibold mb-4 border-b border-yellow-500 pb-2 inline-block">
               Berlangganan
             </h3>
@@ -152,7 +162,7 @@ const Footer: React.FC = () => {
                 Langganan <Heart size={16} className="ml-2" />
               </button>
             </form>
-          </div>
+          </div> */}
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { sanity } from '../sanityClient'
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Send } from 'lucide-react';
 
@@ -44,6 +45,17 @@ const Contact: React.FC = () => {
       });
     }, 1500);
   };
+
+
+   const [contact, setContact] = useState();
+    
+      useEffect(() => {
+        sanity.fetch(`*[_type == "contact_profile"]`).then((data) => {
+          if (data && data.length > 0) {
+            setContact(data[0]); // Ambil yang pertama
+          }
+        });
+      }, []);
 
   return (
     <div className="pt-24">
@@ -95,9 +107,7 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-bold text-gray-800 mb-1">Alamat Kantor</h3>
                     <p className="text-gray-700">
-                      Jl. Harapan Baru No. 123<br />
-                      Jakarta Selatan, DKI Jakarta 12345<br />
-                      Indonesia
+                     {contact?.address}
                     </p>
                   </div>
                 </div>
@@ -109,8 +119,7 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-bold text-gray-800 mb-1">Telepon</h3>
                     <p className="text-gray-700">
-                      +62 812 3456 7890 (Umum)<br />
-                      +62 878 9012 3456 (Donasi)
+                     {contact?.phone}
                     </p>
                   </div>
                 </div>
@@ -122,21 +131,20 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-bold text-gray-800 mb-1">Email</h3>
                     <p className="text-gray-700">
-                      info@cahayauntuknegeri.org<br />
-                      donasi@cahayauntuknegeri.org
+                     {contact?.email}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10">
+              {/* <div className="mt-10">
                 <h3 className="font-bold text-gray-800 mb-3">Jam Operasional</h3>
                 <div className="text-gray-700 space-y-1">
                   <p>Senin - Jumat: 08.00 - 17.00 WIB</p>
                   <p>Sabtu: 09.00 - 14.00 WIB</p>
                   <p>Minggu: Tutup</p>
                 </div>
-              </div>
+              </div> */}
             </motion.div>
 
             {/* Contact Form */}

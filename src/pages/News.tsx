@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'
+import { sanity, urlFor } from '../sanityClient'
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, ChevronRight, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -15,6 +16,15 @@ interface NewsArticle {
 }
 
 const News: React.FC = () => {
+
+
+   const [posts, setPosts] = useState([])
+
+  useEffect(() => {
+    sanity.fetch(`*[_type == "post"]`)
+      .then(setPosts)
+  }, [])
+  
   const articles: NewsArticle[] = [
     {
       id: 1,
@@ -73,8 +83,8 @@ const News: React.FC = () => {
     }
   ];
 
-  const featuredArticle = articles.find(article => article.featured);
-  const regularArticles = articles.filter(article => !article.featured);
+  const featuredArticle = posts.find(article => article.featured);
+  const regularArticles = posts.filter(article => !article.featured);
 
   return (
     <div className="pt-24">
@@ -138,7 +148,7 @@ const News: React.FC = () => {
               <div className="flex flex-col lg:flex-row">
                 <div className="lg:w-1/2">
                   <img 
-                    src={featuredArticle.image} 
+                    src={urlFor(featuredArticle.image).url()} 
                     alt={featuredArticle.title}
                     className="w-full h-full object-cover"
                   />
@@ -176,7 +186,7 @@ const News: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {regularArticles.map((article, index) => (
               <motion.div 
-                key={article.id}
+                key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -185,7 +195,7 @@ const News: React.FC = () => {
               >
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src={article.image} 
+                    src={urlFor(article.image).width(400).url()} 
                     alt={article.title}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
