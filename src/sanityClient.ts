@@ -8,7 +8,7 @@ export const sanity = createClient({
   projectId: 'yhzk3e66',     // ganti dengan ID project kamu
   dataset: 'production',
   apiVersion: '2023-12-01',
-  useCdn: true,
+  useCdn: false,
 })
 
 export const client = sanity;

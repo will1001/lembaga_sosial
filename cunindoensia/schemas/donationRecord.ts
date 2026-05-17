@@ -69,6 +69,21 @@ export default defineType({
       initialValue: 'pending'
     }),
     defineField({
+      name: 'midtrans_order_id',
+      title: 'Order ID Midtrans',
+      type: 'string'
+    }),
+    defineField({
+      name: 'midtrans_transaction_id',
+      title: 'Transaction ID Midtrans',
+      type: 'string'
+    }),
+    defineField({
+      name: 'midtrans_payment_type',
+      title: 'Tipe Pembayaran Midtrans',
+      type: 'string'
+    }),
+    defineField({
       name: 'is_anonymous',
       title: 'Donasi Anonymous?',
       type: 'boolean',

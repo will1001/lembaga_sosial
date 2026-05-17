@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createClient } from '@sanity/client';
 
 const rootDir = process.cwd();
 loadEnvFile(resolve(rootDir, '.env.local'));
@@ -12,6 +13,9 @@ const CLIENT_KEY = process.env.MIDTRANS_CLIENT_KEY || '';
 const MERCHANT_ID = process.env.MIDTRANS_MERCHANT_ID || '';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5175';
 const MIDTRANS_API_BASE = process.env.MIDTRANS_API_BASE || 'https://app.sandbox.midtrans.com';
+const MIDTRANS_STATUS_API_BASE = process.env.MIDTRANS_STATUS_API_BASE || 'https://api.sandbox.midtrans.com';
+const SANITY_PROJECT_ID = process.env.SANITY_PROJECT_ID || 'yhzk3e66';
+const SANITY_DATASET = process.env.SANITY_DATASET || 'production';
 
 if (!SERVER_KEY || !CLIENT_KEY || !MERCHANT_ID) {
   console.warn('[midtrans] Missing sandbox credentials. Fill MIDTRANS_SERVER_KEY, MIDTRANS_CLIENT_KEY, and MIDTRANS_MERCHANT_ID in .env.local.');
@@ -56,6 +60,18 @@ const server = createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/midtrans/notification') {
       const notification = await readJson(req);
       const verified = verifyMidtransSignature(notification);
+      let donationUpdated = false;
+      let updateReason = verified ? 'not_successful' : 'invalid_signature';
+
+      if (verified && isSuccessfulPayment(notification)) {
+        const status = await fetchMidtransStatus(notification.order_id);
+        const result = await recordSuccessfulDonation({
+          ...notification,
+          ...status,
+        });
+        donationUpdated = result.updated;
+        updateReason = result.reason || 'updated';
+      }
 
       console.log('[midtrans] notification', {
         orderId: notification.order_id,
@@ -63,10 +79,13 @@ const server = createServer(async (req, res) => {
         fraudStatus: notification.fraud_status,
         paymentType: notification.payment_type,
         verified,
+        donationUpdated,
       });
 
       sendJson(res, verified ? 200 : 403, {
         ok: verified,
+        donationUpdated,
+        reason: updateReason,
       });
       return;
     }
@@ -177,6 +196,101 @@ function verifyMidtransSignature(notification) {
   return expected === notification.signature_key;
 }
 
+function isSuccessfulPayment(notification) {
+  return ['settlement', 'capture'].includes(notification.transaction_status);
+}
+
+async function fetchMidtransStatus(orderId) {
+  const response = await fetch(`${MIDTRANS_STATUS_API_BASE}/v2/${encodeURIComponent(orderId)}/status`, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${SERVER_KEY}:`).toString('base64')}`,
+      Accept: 'application/json',
+    },
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.status_message || `Failed to fetch Midtrans status: ${response.status}`);
+  }
+
+  return data;
+}
+
+async function recordSuccessfulDonation(transaction) {
+  const token = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN;
+  if (!token) {
+    throw new Error('SANITY_AUTH_TOKEN is not configured');
+  }
+
+  const programId = sanitizeSanityId(transaction.custom_field1 || '');
+  if (!programId) {
+    throw new Error('Midtrans custom_field1 is missing donation program id');
+  }
+
+  const amount = Number(transaction.gross_amount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Invalid donation amount from Midtrans');
+  }
+
+  const client = createClient({
+    projectId: SANITY_PROJECT_ID,
+    dataset: SANITY_DATASET,
+    apiVersion: '2023-12-01',
+    token,
+    useCdn: false,
+  });
+
+  const program = await client.fetch('*[_type == "donation" && _id == $programId][0]._id', { programId });
+  if (!program) {
+    throw new Error(`Donation program not found in Sanity: ${programId}`);
+  }
+
+  const orderId = sanitizeSanityId(transaction.order_id);
+  const recordId = `donation_record.${orderId}`;
+  const record = {
+    _id: recordId,
+    _type: 'donation_record',
+    donation_program: {
+      _type: 'reference',
+      _ref: programId,
+    },
+    donor_name: transaction.customer_details?.first_name || transaction.customer_name || 'Anonymous',
+    donor_email: transaction.customer_details?.email || transaction.customer_email || 'donatur@example.com',
+    donor_phone: transaction.customer_details?.phone || transaction.customer_phone || '',
+    amount,
+    message: '',
+    payment_method: transaction.custom_field3 || transaction.payment_type || 'midtrans',
+    payment_status: 'success',
+    is_anonymous: false,
+    created_at: transaction.settlement_time || transaction.transaction_time || new Date().toISOString(),
+    midtrans_order_id: transaction.order_id,
+    midtrans_transaction_id: transaction.transaction_id || '',
+    midtrans_payment_type: transaction.payment_type || '',
+  };
+
+  try {
+    await client
+      .transaction()
+      .create(record)
+      .patch(programId, (patch) => patch.inc({ current_amount: amount, donors_count: 1 }))
+      .commit();
+
+    return { updated: true };
+  } catch (error) {
+    if (isDuplicateDocumentError(error)) {
+      return { updated: false, reason: 'already_recorded' };
+    }
+
+    throw error;
+  }
+}
+
+function isDuplicateDocumentError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes('Document already exists') || message.includes('already exists');
+}
+
 function readJson(req) {
   return new Promise((resolveJson, reject) => {
     let raw = '';
@@ -234,4 +348,8 @@ function sanitizeText(value) {
 
 function sanitizeOrderId(value) {
   return sanitizeText(value).replace(/[^A-Za-z0-9._~-]/g, '-').slice(0, 50);
+}
+
+function sanitizeSanityId(value) {
+  return String(value || '').replace(/[^A-Za-z0-9._-]/g, '-').slice(0, 128);
 }
