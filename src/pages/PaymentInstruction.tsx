@@ -86,9 +86,17 @@ const PaymentInstruction: React.FC = () => {
               <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-5">
                 <h3 className="font-bold text-amber-900 mb-2">Catatan untuk Midtrans</h3>
                 <p className="text-amber-800 text-sm">
-                  Halaman ini adalah simulasi instruksi pembayaran. Setelah API Midtrans/Strapi tersambung,
-                  nomor VA, QRIS, token pembayaran, dan status transaksi akan dibuat otomatis oleh payment gateway.
+                  Jika transaksi dibuat dari sandbox Midtrans, gunakan tombol di bawah untuk membuka ulang halaman pembayaran.
+                  Status final tetap perlu webhook backend agar tercatat otomatis.
                 </p>
+                {transaction.midtransRedirectUrl && (
+                  <a
+                    href={transaction.midtransRedirectUrl}
+                    className="mt-4 inline-flex bg-amber-600 text-white px-5 py-3 rounded-lg font-medium hover:bg-amber-700"
+                  >
+                    Buka Pembayaran Midtrans
+                  </a>
+                )}
               </div>
             </div>
 

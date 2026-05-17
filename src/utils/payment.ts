@@ -13,6 +13,8 @@ export type DonationTransaction = {
   paymentStatus: 'pending' | 'success' | 'failed' | 'cancelled';
   createdAt: string;
   expiresAt: string;
+  midtransToken?: string;
+  midtransRedirectUrl?: string;
 };
 
 const STORAGE_KEY = 'cunindoensia_donation_transactions';
@@ -67,4 +69,50 @@ export function getPaymentInstruction(orderId: string): string[] {
   if (!transaction) return [];
 
   return findPaymentMethod(transaction.paymentMethod).instructions;
+}
+
+export type MidtransSnapTransaction = {
+  orderId: string;
+  token: string;
+  redirectUrl: string;
+  merchantId: string;
+  clientKey: string;
+};
+
+export async function createMidtransSnapTransaction(
+  transaction: DonationTransaction
+): Promise<MidtransSnapTransaction> {
+  const endpoint = import.meta.env.VITE_MIDTRANS_API_URL || 'http://127.0.0.1:8787/api/midtrans/create-transaction';
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      orderId: transaction.orderId,
+      programId: transaction.programId,
+      programTitle: transaction.programTitle,
+      amount: transaction.amount,
+      donorName: transaction.donorName,
+      donorEmail: transaction.donorEmail,
+      donorPhone: transaction.donorPhone,
+      message: transaction.message,
+      paymentMethod: transaction.paymentMethod,
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Gagal membuat transaksi Midtrans');
+  }
+
+  return {
+    orderId: data.orderId,
+    token: data.token,
+    redirectUrl: data.redirectUrl,
+    merchantId: data.merchantId,
+    clientKey: data.clientKey,
+  };
 }

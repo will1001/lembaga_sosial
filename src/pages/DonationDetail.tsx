@@ -5,7 +5,7 @@ import imageUrlBuilder from '@sanity/image-url';
 import { PortableText } from '@portabletext/react';
 import { motion } from 'framer-motion';
 import DonationForm, { DonationSubmitData } from '../components/DonationForm';
-import { createDonationTransaction } from '../utils/payment';
+import { createDonationTransaction, createMidtransSnapTransaction, saveDonationTransaction } from '../utils/payment';
 
 const builder = imageUrlBuilder(client);
 function urlFor(source: any) {
@@ -100,7 +100,21 @@ const DonationDetail: React.FC = () => {
       paymentMethod: data.paymentMethod,
     });
 
-    navigate(`/payment/${transaction.orderId}`);
+    try {
+      const snap = await createMidtransSnapTransaction(transaction);
+      const updatedTransaction = {
+        ...transaction,
+        midtransToken: snap.token,
+        midtransRedirectUrl: snap.redirectUrl,
+      };
+
+      saveDonationTransaction(updatedTransaction);
+      window.location.href = snap.redirectUrl;
+    } catch (error) {
+      console.error('Error creating Midtrans transaction:', error);
+      alert('Transaksi Midtrans belum bisa dibuat. Pastikan server sandbox Midtrans lokal sedang berjalan.');
+      navigate(`/payment/${transaction.orderId}`);
+    }
   };
 
   if (loading) {
