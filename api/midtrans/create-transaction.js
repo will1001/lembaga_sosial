@@ -89,7 +89,6 @@ function buildSnapPayload(body, frontendUrl) {
       email: donorEmail,
       phone: donorPhone,
     },
-    enabled_payments: mapPaymentMethod(paymentMethod),
     callbacks: {
       finish: `${frontendUrl}/payment/${encodeURIComponent(orderId)}?status=finish`,
       error: `${frontendUrl}/payment/${encodeURIComponent(orderId)}?status=error`,
@@ -99,21 +98,6 @@ function buildSnapPayload(body, frontendUrl) {
     custom_field2: programTitle.slice(0, 255),
     custom_field3: paymentMethod,
   };
-}
-
-function mapPaymentMethod(method) {
-  const map = {
-    gopay: ['gopay'],
-    qris: ['qris'],
-    va_mandiri: ['echannel'],
-    va_bsi: ['bank_transfer'],
-    va_bri: ['bri_va'],
-    va_bca: ['bca_va'],
-    va_bni: ['bni_va'],
-    transfer_bca: ['bca_va'],
-  };
-
-  return map[method] || ['qris', 'gopay', 'bca_va', 'bni_va', 'bri_va', 'echannel'];
 }
 
 function setCorsHeaders(res) {

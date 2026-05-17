@@ -117,7 +117,6 @@ function buildSnapPayload(body) {
       email: donorEmail,
       phone: donorPhone,
     },
-    enabled_payments: mapPaymentMethod(paymentMethod),
     callbacks: {
       finish: `${FRONTEND_URL}/payment/${encodeURIComponent(orderId)}?status=finish`,
       error: `${FRONTEND_URL}/payment/${encodeURIComponent(orderId)}?status=error`,
@@ -159,21 +158,6 @@ function verifyMidtransSignature(notification) {
   const source = `${notification.order_id}${notification.status_code}${notification.gross_amount}${SERVER_KEY}`;
   const expected = createHash('sha512').update(source).digest('hex');
   return expected === notification.signature_key;
-}
-
-function mapPaymentMethod(method) {
-  const map = {
-    gopay: ['gopay'],
-    qris: ['qris'],
-    va_mandiri: ['echannel'],
-    va_bsi: ['bank_transfer'],
-    va_bri: ['bri_va'],
-    va_bca: ['bca_va'],
-    va_bni: ['bni_va'],
-    transfer_bca: ['bca_va'],
-  };
-
-  return map[method] || ['qris', 'gopay', 'bca_va', 'bni_va', 'bri_va', 'echannel'];
 }
 
 function readJson(req) {
