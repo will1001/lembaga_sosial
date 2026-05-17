@@ -112,7 +112,8 @@ const DonationDetail: React.FC = () => {
       window.location.href = snap.redirectUrl;
     } catch (error) {
       console.error('Error creating Midtrans transaction:', error);
-      alert('Transaksi Midtrans belum bisa dibuat. Pastikan server sandbox Midtrans lokal sedang berjalan.');
+      const message = error instanceof Error ? error.message : 'Gagal membuat transaksi Midtrans';
+      alert(`Transaksi Midtrans belum bisa dibuat: ${message}`);
       navigate(`/payment/${transaction.orderId}`);
     }
   };
