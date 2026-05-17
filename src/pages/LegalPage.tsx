@@ -5,14 +5,27 @@ type LegalPageProps = {
   type: 'terms' | 'privacy' | 'refund';
 };
 
+const organization = {
+  name: 'Yayasan Cahaya Untuk Negeri',
+  legalName: 'YAYASAN CAHAYA UNTUK NEGERI',
+  website: 'https://www.cunindonesia.org/',
+  email: 'yayasancahayauntuknegri@gmail.com',
+  phone: '+62 878-4292-5598',
+  address: 'Dasan Reban, Desa Bagik Payung Selatan, Kecamatan Suralaga, Kabupaten Lombok Timur, Nusa Tenggara Barat',
+};
+
 const content = {
   terms: {
     title: 'Syarat dan Ketentuan',
-    intro: 'Syarat ini mengatur penggunaan layanan donasi Cahaya Untuk Negeri.',
+    intro: `Syarat ini mengatur penggunaan website dan layanan donasi ${organization.name}.`,
     sections: [
       {
-        title: 'Layanan Donasi',
-        body: 'Website ini menyediakan informasi program sosial dan fasilitas donasi untuk mendukung program yang dipilih donatur.',
+        title: 'Identitas Pengelola',
+        body: `${organization.name} dikelola oleh ${organization.legalName} yang beralamat di ${organization.address}. Website resmi lembaga adalah ${organization.website}.`,
+      },
+      {
+        title: 'Layanan Donasi dan Program Sosial',
+        body: `${organization.name} menyediakan informasi kegiatan sosial, program bantuan, dan fasilitas donasi untuk mendukung program yang dipilih donatur melalui website resmi.`,
       },
       {
         title: 'Nominal dan Mata Uang',
@@ -20,25 +33,33 @@ const content = {
       },
       {
         title: 'Metode Pembayaran',
-        body: 'Metode pembayaran dapat meliputi QRIS, e-wallet, virtual account, dan transfer bank sesuai ketersediaan pada halaman checkout.',
+        body: 'Metode pembayaran dapat meliputi QRIS, e-wallet, virtual account, transfer bank, dan metode lain yang tersedia melalui penyedia payment gateway pada halaman checkout.',
       },
       {
         title: 'Penyaluran Dana',
-        body: 'Dana donasi akan digunakan untuk program yang dipilih dan/atau kebutuhan operasional penyaluran yang relevan dengan program tersebut.',
+        body: 'Dana donasi akan digunakan untuk program yang dipilih dan/atau kebutuhan operasional penyaluran yang relevan dengan pelaksanaan program sosial tersebut.',
       },
       {
         title: 'Perubahan Program',
         body: 'Apabila program selesai, berubah, atau tidak dapat dilaksanakan karena kondisi tertentu, pengelola dapat mengalihkan dana ke program sosial lain yang sejenis.',
       },
+      {
+        title: 'Kontak Resmi',
+        body: `Pertanyaan terkait program, transaksi, atau layanan donasi dapat dikirim ke email ${organization.email} atau nomor kontak ${organization.phone}.`,
+      },
     ],
   },
   privacy: {
     title: 'Kebijakan Privasi',
-    intro: 'Kebijakan ini menjelaskan bagaimana data donatur dikumpulkan dan digunakan.',
+    intro: `Kebijakan ini menjelaskan bagaimana ${organization.name} mengumpulkan dan menggunakan data donatur.`,
     sections: [
       {
+        title: 'Pengelola Data',
+        body: `Data donatur pada website ini dikelola oleh ${organization.name}, beralamat di ${organization.address}.`,
+      },
+      {
         title: 'Data yang Dikumpulkan',
-        body: 'Kami dapat mengumpulkan nama, email, nomor telepon, nominal donasi, pesan, pilihan anonim, metode pembayaran, dan status transaksi.',
+        body: 'Kami dapat mengumpulkan nama, email, nomor telepon, nominal donasi, pesan donatur, pilihan anonim, metode pembayaran, ID transaksi, dan status transaksi.',
       },
       {
         title: 'Penggunaan Data',
@@ -46,7 +67,7 @@ const content = {
       },
       {
         title: 'Keamanan Data',
-        body: 'Kami menerapkan pembatasan akses internal dan menggunakan layanan pembayaran yang mendukung proses transaksi aman.',
+        body: 'Kami menerapkan pembatasan akses internal dan menggunakan layanan pembayaran pihak ketiga yang mendukung proses transaksi aman.',
       },
       {
         title: 'Pembagian Data',
@@ -54,29 +75,33 @@ const content = {
       },
       {
         title: 'Kontak Privasi',
-        body: 'Permintaan koreksi atau penghapusan data dapat dikirim melalui halaman kontak resmi.',
+        body: `Permintaan koreksi, pembaruan, atau penghapusan data dapat dikirim ke ${organization.email} atau ${organization.phone}.`,
       },
     ],
   },
   refund: {
     title: 'Kebijakan Pengembalian Dana',
-    intro: 'Kebijakan ini menjelaskan kondisi pengembalian dana donasi.',
+    intro: `Kebijakan ini menjelaskan aturan pengembalian dana donasi pada ${organization.name}.`,
     sections: [
       {
-        title: 'Donasi Berhasil',
-        body: 'Donasi yang sudah berhasil dan tercatat pada sistem pada prinsipnya tidak dapat dibatalkan karena dana diproses untuk penyaluran program.',
+        title: 'Ketentuan Final Donasi',
+        body: 'Donasi yang sudah berhasil dibayarkan dan tercatat pada sistem bersifat final serta tidak dapat dibatalkan secara sepihak karena dana diproses untuk penyaluran program sosial.',
       },
       {
-        title: 'Kondisi Pengembalian',
-        body: 'Pengembalian dana dapat dipertimbangkan jika terjadi pembayaran ganda, nominal tidak sesuai akibat gangguan sistem, atau transaksi tidak sah yang dapat dibuktikan.',
+        title: 'Pengecualian Pengembalian Dana',
+        body: 'Pengembalian dana hanya dapat dipertimbangkan apabila terjadi pembayaran ganda, nominal tidak sesuai akibat gangguan sistem, transaksi berhasil tetapi tidak tercatat, atau transaksi tidak sah yang dapat dibuktikan.',
       },
       {
         title: 'Proses Pengajuan',
-        body: 'Donatur dapat menghubungi kontak resmi dengan menyertakan ID transaksi, bukti pembayaran, nama, email, nomor telepon, dan alasan pengajuan.',
+        body: `Donatur dapat mengajukan pemeriksaan melalui ${organization.email} atau ${organization.phone} dengan menyertakan ID transaksi, bukti pembayaran, nama, email, nomor telepon, nominal, tanggal transaksi, dan alasan pengajuan.`,
       },
       {
-        title: 'Waktu Pemeriksaan',
-        body: 'Pengajuan akan diperiksa maksimal 7 hari kerja. Jika disetujui, pengembalian mengikuti jadwal dan ketentuan bank atau payment gateway.',
+        title: 'Batas Waktu Pengajuan',
+        body: 'Pengajuan pengembalian dana wajib dikirim maksimal 3 hari kalender sejak tanggal transaksi. Pengajuan di luar batas waktu tersebut dapat ditolak.',
+      },
+      {
+        title: 'Waktu Pemeriksaan dan Pencairan',
+        body: 'Pengajuan akan diperiksa maksimal 7 hari kerja. Jika disetujui, proses pengembalian mengikuti jadwal dan ketentuan bank, e-wallet, atau payment gateway yang digunakan.',
       },
       {
         title: 'Biaya Transaksi',
@@ -111,6 +136,23 @@ const LegalPage: React.FC<LegalPageProps> = ({ type }) => {
             <p className="text-sm text-gray-500 mb-8">
               Terakhir diperbarui: 17 Mei 2026
             </p>
+            <div className="mb-10 rounded-lg border border-amber-100 bg-amber-50 p-5">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Informasi Lembaga</h2>
+              <dl className="grid gap-3 text-sm md:grid-cols-[180px_1fr]">
+                <dt className="font-semibold text-gray-700">Nama lembaga</dt>
+                <dd className="text-gray-800">{organization.name}</dd>
+                <dt className="font-semibold text-gray-700">Nama legal</dt>
+                <dd className="text-gray-800">{organization.legalName}</dd>
+                <dt className="font-semibold text-gray-700">Alamat</dt>
+                <dd className="text-gray-800">{organization.address}</dd>
+                <dt className="font-semibold text-gray-700">Email</dt>
+                <dd className="text-gray-800">{organization.email}</dd>
+                <dt className="font-semibold text-gray-700">Nomor kontak</dt>
+                <dd className="text-gray-800">{organization.phone}</dd>
+                <dt className="font-semibold text-gray-700">Website</dt>
+                <dd className="text-gray-800">{organization.website}</dd>
+              </dl>
+            </div>
             <div className="space-y-8">
               {page.sections.map((section) => (
                 <section key={section.title}>
