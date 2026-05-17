@@ -70,6 +70,7 @@ function buildSnapPayload(body, frontendUrl) {
   const donorPhone = sanitizeText(body.donorPhone || '');
   const programTitle = sanitizeText(body.programTitle || 'Donasi Cahaya Untuk Negeri');
   const paymentMethod = sanitizeText(body.paymentMethod || 'qris');
+  const enabledPayments = getEnabledPayments(paymentMethod);
 
   return {
     transaction_details: {
@@ -97,7 +98,23 @@ function buildSnapPayload(body, frontendUrl) {
     custom_field1: sanitizeText(body.programId || ''),
     custom_field2: programTitle.slice(0, 255),
     custom_field3: paymentMethod,
+    enabled_payments: enabledPayments,
   };
+}
+
+function getEnabledPayments(paymentMethod) {
+  const channels = {
+    gopay: ['gopay'],
+    qris: ['qris'],
+    va_mandiri: ['echannel'],
+    va_bsi: ['bsi_va'],
+    va_bri: ['bri_va'],
+    va_bca: ['bca_va'],
+    va_bni: ['bni_va'],
+    transfer_bca: ['bca_va'],
+  };
+
+  return channels[paymentMethod] || channels.qris;
 }
 
 function setCorsHeaders(res) {
