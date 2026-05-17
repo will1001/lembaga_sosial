@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       orderId: payload.transaction_details.order_id,
       token: data.token,
-      redirectUrl: data.redirect_url,
+      redirectUrl: buildRedirectUrl(data.redirect_url, payload.custom_field3),
       merchantId,
       clientKey,
     });
@@ -115,6 +115,15 @@ function getEnabledPayments(paymentMethod) {
   };
 
   return channels[paymentMethod] || channels.qris;
+}
+
+function buildRedirectUrl(redirectUrl, paymentMethod) {
+  if (paymentMethod !== 'qris' || !redirectUrl) {
+    return redirectUrl;
+  }
+
+  const separator = redirectUrl.includes('?') ? '&' : '?';
+  return `${redirectUrl}${separator}gopayMode=qr`;
 }
 
 function setCorsHeaders(res) {

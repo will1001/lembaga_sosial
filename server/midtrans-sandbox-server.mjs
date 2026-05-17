@@ -50,7 +50,7 @@ const server = createServer(async (req, res) => {
       sendJson(res, 200, {
         orderId: payload.transaction_details.order_id,
         token: response.token,
-        redirectUrl: response.redirect_url,
+        redirectUrl: buildRedirectUrl(response.redirect_url, payload.custom_field3),
         merchantId: MERCHANT_ID,
         clientKey: CLIENT_KEY,
       });
@@ -162,6 +162,15 @@ function getEnabledPayments(paymentMethod) {
   };
 
   return channels[paymentMethod] || channels.qris;
+}
+
+function buildRedirectUrl(redirectUrl, paymentMethod) {
+  if (paymentMethod !== 'qris' || !redirectUrl) {
+    return redirectUrl;
+  }
+
+  const separator = redirectUrl.includes('?') ? '&' : '?';
+  return `${redirectUrl}${separator}gopayMode=qr`;
 }
 
 async function createSnapTransaction(payload) {
