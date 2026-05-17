@@ -9,6 +9,10 @@ import Programs from './pages/Programs';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import News from './pages/News';
+import Donation from './pages/Donation';
+import DonationDetail from './pages/DonationDetail';
+import LegalPage from './pages/LegalPage';
+import PaymentInstruction from './pages/PaymentInstruction';
 
 function App() {
   return (
@@ -23,6 +27,12 @@ function App() {
           <Route path="/galeri" element={<Gallery />} />
           <Route path="/kontak" element={<Contact />} />
           <Route path="/berita" element={<News />} />
+          <Route path="/donasi" element={<Donation />} />
+          <Route path="/donasi/:slug" element={<DonationDetail />} />
+          <Route path="/payment/:orderId" element={<PaymentInstruction />} />
+          <Route path="/syarat-ketentuan" element={<LegalPage type="terms" />} />
+          <Route path="/kebijakan-privasi" element={<LegalPage type="privacy" />} />
+          <Route path="/kebijakan-pengembalian-dana" element={<LegalPage type="refund" />} />
         </Routes>
       </main>
       <Footer />

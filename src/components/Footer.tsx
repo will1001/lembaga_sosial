@@ -138,6 +138,30 @@ const Footer: React.FC = () => {
                   Kontak
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/syarat-ketentuan"
+                  className="text-gray-300 hover:text-yellow-500 transition-colors"
+                >
+                  Syarat & Ketentuan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/kebijakan-pengembalian-dana"
+                  className="text-gray-300 hover:text-yellow-500 transition-colors"
+                >
+                  Kebijakan Refund
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/kebijakan-privasi"
+                  className="text-gray-300 hover:text-yellow-500 transition-colors"
+                >
+                  Kebijakan Privasi
+                </Link>
+              </li>
             </ul>
           </div>
 
