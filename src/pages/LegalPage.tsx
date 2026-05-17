@@ -10,7 +10,7 @@ const organization = {
   legalName: 'YAYASAN CAHAYA UNTUK NEGERI',
   website: 'https://www.cunindonesia.org/',
   email: 'yayasancahayauntuknegri@gmail.com',
-  phone: '+62 878-4292-5598',
+  phone: '+62 878-8770-5166',
   address: 'Dasan Reban, Desa Bagik Payung Selatan, Kecamatan Suralaga, Kabupaten Lombok Timur, Nusa Tenggara Barat',
 };
 
