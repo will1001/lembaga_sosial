@@ -52,11 +52,13 @@ export default async function handler(req, res) {
     console.error('[midtrans] donation update failed', {
       orderId: notification.order_id,
       error: error instanceof Error ? error.message : 'Unknown error',
+      sanityAuth: getSanityAuthDebug(),
     });
 
     res.status(500).json({
       ok: false,
       error: error instanceof Error ? error.message : 'Failed to update donation total',
+      sanityAuth: getSanityAuthDebug(),
     });
   }
 }
@@ -159,6 +161,22 @@ function isDuplicateDocumentError(error) {
 function getSanityToken() {
   const token = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN || '';
   return token.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
+}
+
+function getSanityAuthDebug() {
+  const rawToken = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN || '';
+  const token = getSanityToken();
+
+  return {
+    hasToken: Boolean(rawToken),
+    rawLength: rawToken.length,
+    normalizedLength: token.length,
+    prefix: token.slice(0, 4),
+    hasBearerPrefix: /^Bearer\s+/i.test(rawToken.trim()),
+    hasWrappingQuotes: /^["'].*["']$/.test(rawToken.trim()),
+    projectId: SANITY_PROJECT_ID,
+    dataset: SANITY_DATASET,
+  };
 }
 
 function sanitizeSanityId(value) {
