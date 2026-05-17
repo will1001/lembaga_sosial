@@ -105,7 +105,7 @@ function buildSnapPayload(body, frontendUrl) {
 function getEnabledPayments(paymentMethod) {
   const channels = {
     gopay: ['gopay'],
-    qris: ['qris'],
+    qris: ['gopay'],
     va_mandiri: ['echannel'],
     va_bsi: ['bsi_va'],
     va_bri: ['bri_va'],
