@@ -82,7 +82,7 @@ export type MidtransSnapTransaction = {
 export async function createMidtransSnapTransaction(
   transaction: DonationTransaction
 ): Promise<MidtransSnapTransaction> {
-  const endpoint = import.meta.env.VITE_MIDTRANS_API_URL || 'http://127.0.0.1:8787/api/midtrans/create-transaction';
+  const endpoint = import.meta.env.VITE_MIDTRANS_API_URL || '/api/midtrans/create-transaction';
 
   const response = await fetch(endpoint, {
     method: 'POST',
