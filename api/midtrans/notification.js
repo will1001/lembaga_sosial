@@ -83,7 +83,7 @@ async function fetchMidtransStatus(orderId, serverKey) {
 }
 
 async function recordSuccessfulDonation(transaction) {
-  const token = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN;
+  const token = getSanityToken();
   if (!token) {
     throw new Error('SANITY_AUTH_TOKEN is not configured');
   }
@@ -154,6 +154,11 @@ async function recordSuccessfulDonation(transaction) {
 function isDuplicateDocumentError(error) {
   const message = error instanceof Error ? error.message : String(error);
   return message.includes('Document already exists') || message.includes('already exists');
+}
+
+function getSanityToken() {
+  const token = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN || '';
+  return token.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
 }
 
 function sanitizeSanityId(value) {
