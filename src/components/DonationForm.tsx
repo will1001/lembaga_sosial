@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { ChevronRight, Info, Minus, Plus, X } from 'lucide-react';
 import { paymentGroups, paymentMethods } from '../data/paymentMethods';
 
 interface DonationFormProps {
@@ -36,6 +37,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentSheetOpen, setPaymentSheetOpen] = useState(false);
   const predefinedAmounts = [10000, 25000, 50000, 100000, 250000, 500000];
 
   const formatCurrency = (amount: number) => {
@@ -48,6 +50,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
   };
 
   const selectedAmount = parseInt(formData.amount, 10) || parseInt(formData.customAmount, 10) || 0;
+  const selectedMethod = paymentMethods.find((method) => method.id === formData.paymentMethod) ?? paymentMethods[0];
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -141,11 +144,22 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
 
   const handleMethodSelect = (methodId: string) => {
     setFormData((prev) => ({ ...prev, paymentMethod: methodId }));
+    setPaymentSheetOpen(false);
     setErrors((prev) => {
       const next = { ...prev };
       delete next.paymentMethod;
       return next;
     });
+  };
+
+  const adjustCustomAmount = (direction: 1 | -1) => {
+    const baseAmount = selectedAmount || 1000;
+    const nextAmount = Math.max(1000, baseAmount + direction * 1000);
+    setFormData((prev) => ({
+      ...prev,
+      amount: '',
+      customAmount: nextAmount.toString(),
+    }));
   };
 
   return (
@@ -163,6 +177,10 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Pilih Jumlah Donasi
           </label>
+          <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
+            <p className="text-xs font-medium text-gray-500">Nominal donasi</p>
+            <p className="mt-1 text-2xl font-bold text-gray-950">{formatCurrency(selectedAmount)}</p>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
             {predefinedAmounts.map((amount) => (
               <button
@@ -183,18 +201,36 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Atau masukkan jumlah lainnya
           </label>
-          <input
-            type="number"
-            name="customAmount"
-            value={formData.customAmount}
-            onChange={(event) => {
-              setFormData((prev) => ({ ...prev, customAmount: event.target.value, amount: '' }));
-              handleInputChange(event);
-            }}
-            min="1000"
-            placeholder="Masukkan jumlah donasi"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent"
-          />
+          <div className="grid grid-cols-[1fr_50px_50px] gap-2">
+            <input
+              type="number"
+              name="customAmount"
+              value={formData.customAmount}
+              onChange={(event) => {
+                setFormData((prev) => ({ ...prev, customAmount: event.target.value, amount: '' }));
+                handleInputChange(event);
+              }}
+              min="1000"
+              placeholder="Masukkan jumlah donasi"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={() => adjustCustomAmount(-1)}
+              className="flex items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              aria-label="Kurangi nominal"
+            >
+              <Minus size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => adjustCustomAmount(1)}
+              className="flex items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              aria-label="Tambah nominal"
+            >
+              <Plus size={18} />
+            </button>
+          </div>
           {errors.amount && <p className="text-red-600 text-sm mt-1">{errors.amount}</p>}
         </div>
 
@@ -256,6 +292,10 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
             />
             {errors.donorPhone && <p className="text-red-600 text-sm mt-1">{errors.donorPhone}</p>}
           </div>
+          <div className="flex items-start gap-2 rounded-lg bg-orange-50 p-3 text-xs leading-relaxed text-orange-800">
+            <Info size={16} className="mt-0.5 shrink-0" />
+            Pastikan nomor WhatsApp aktif untuk menerima bukti pembayaran dan update penyaluran donasi.
+          </div>
         </div>
 
         <div>
@@ -276,40 +316,17 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Metode Pembayaran
           </label>
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            {paymentGroups.map((group) => (
-              <div key={group.id}>
-                <div className="bg-gray-100 px-4 py-3 text-sm font-bold text-gray-900">
-                  {group.title}
-                </div>
-                <div className="divide-y divide-gray-200">
-                  {paymentMethods
-                    .filter((method) => method.group === group.id)
-                    .map((method) => (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => handleMethodSelect(method.id)}
-                        className={`w-full flex items-center justify-between gap-4 px-4 py-4 text-left transition-colors ${
-                          formData.paymentMethod === method.id
-                            ? 'bg-amber-50 text-amber-800'
-                            : 'bg-white hover:bg-gray-50'
-                        }`}
-                      >
-                        <span className="font-medium">{method.name}</span>
-                        <span
-                          className={`h-4 w-4 rounded-full border ${
-                            formData.paymentMethod === method.id
-                              ? 'border-amber-600 bg-amber-600'
-                              : 'border-gray-300'
-                          }`}
-                        />
-                      </button>
-                    ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => setPaymentSheetOpen(true)}
+            className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-4 text-left transition hover:border-amber-300 hover:bg-amber-50"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-gray-950">{selectedMethod.name}</span>
+              <span className="mt-1 block text-xs text-gray-500">{selectedMethod.group}</span>
+            </span>
+            <ChevronRight size={18} className="text-gray-500" />
+          </button>
           {errors.paymentMethod && <p className="text-red-600 text-sm mt-1">{errors.paymentMethod}</p>}
         </div>
 
@@ -349,6 +366,63 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
           {isSubmitting ? 'Memproses...' : 'Lanjutkan Pembayaran'}
         </button>
       </form>
+
+      {paymentSheetOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-0 sm:px-4">
+          <div className="max-h-[86vh] w-full max-w-md overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+            <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-4">
+              <button
+                type="button"
+                onClick={() => setPaymentSheetOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+                aria-label="Tutup metode pembayaran"
+              >
+                <X size={20} />
+              </button>
+              <h4 className="text-base font-bold text-gray-950">Pilih Metode Pembayaran</h4>
+            </div>
+            <div className="space-y-3 p-4">
+              {paymentGroups.map((group) => (
+                <div key={group.id} className="overflow-hidden rounded-xl border border-gray-200">
+                  <div className="bg-gray-100 px-4 py-3 text-sm font-bold text-gray-600">
+                    {group.title}
+                  </div>
+                  <div className="divide-y divide-gray-200">
+                    {paymentMethods
+                      .filter((method) => method.group === group.id)
+                      .map((method) => (
+                        <button
+                          key={method.id}
+                          type="button"
+                          onClick={() => handleMethodSelect(method.id)}
+                          className={`flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition ${
+                            formData.paymentMethod === method.id
+                              ? 'bg-amber-50 text-amber-800'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>
+                            <span className="block font-medium">{method.name}</span>
+                            <span className="mt-1 block text-xs text-gray-500">
+                              Minimal {formatCurrency(method.minAmount)}
+                            </span>
+                          </span>
+                          <span
+                            className={`h-4 w-4 rounded-full border ${
+                              formData.paymentMethod === method.id
+                                ? 'border-amber-600 bg-amber-600'
+                                : 'border-gray-300'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
