@@ -40,7 +40,12 @@ export function createDonationTransaction(
 
 export function saveDonationTransaction(transaction: DonationTransaction): void {
   const transactions = getDonationTransactions();
-  const existingIndex = transactions.findIndex((item) => item.orderId === transaction.orderId);
+  const existingIndex = transactions.findIndex((item) => {
+    return (
+      item.orderId === transaction.orderId ||
+      (item.createdAt === transaction.createdAt && item.programId === transaction.programId)
+    );
+  });
 
   if (existingIndex >= 0) {
     transactions[existingIndex] = transaction;
@@ -76,7 +81,7 @@ export type MidtransSnapTransaction = {
   token: string;
   redirectUrl: string;
   merchantId: string;
-  clientKey: string;
+  clientKey?: string;
 };
 
 export async function createMidtransSnapTransaction(

@@ -6,6 +6,8 @@ const SANITY_PROJECT_ID = process.env.SANITY_PROJECT_ID || 'yhzk3e66';
 const SANITY_DATASET = process.env.SANITY_DATASET || 'production';
 
 export default async function handler(req, res) {
+  setSecurityHeaders(res);
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
@@ -42,10 +44,17 @@ export default async function handler(req, res) {
 
   try {
     const status = await fetchMidtransStatus(notification.order_id, serverKey);
-    const result = await recordSuccessfulDonation({
+    const verifiedTransaction = {
       ...notification,
       ...status,
-    });
+    };
+
+    if (!isSuccessfulPayment(verifiedTransaction)) {
+      res.status(200).json({ ok: true, donationUpdated: false, reason: 'status_not_successful' });
+      return;
+    }
+
+    const result = await recordSuccessfulDonation(verifiedTransaction);
 
     res.status(200).json({ ok: true, donationUpdated: result.updated, reason: result.reason });
   } catch (error) {
@@ -64,7 +73,13 @@ export default async function handler(req, res) {
 }
 
 function isSuccessfulPayment(notification) {
-  return ['settlement', 'capture'].includes(notification.transaction_status);
+  const merchantId = process.env.MIDTRANS_MERCHANT_ID || '';
+  const merchantMatches = !merchantId || !notification.merchant_id || notification.merchant_id === merchantId;
+  const statusCodeOk = String(notification.status_code || '') === '200';
+  const settled = notification.transaction_status === 'settlement';
+  const captured = notification.transaction_status === 'capture' && notification.fraud_status === 'accept';
+
+  return merchantMatches && statusCodeOk && (settled || captured);
 }
 
 async function fetchMidtransStatus(orderId, serverKey) {
@@ -108,9 +123,9 @@ async function recordSuccessfulDonation(transaction) {
     useCdn: false,
   });
 
-  const program = await client.fetch('*[_type == "donation" && _id == $programId][0]._id', { programId });
+  const program = await client.fetch('*[_type == "donation" && _id == $programId && is_active == true][0]._id', { programId });
   if (!program) {
-    throw new Error(`Donation program not found in Sanity: ${programId}`);
+    throw new Error(`Donation program not found or inactive in Sanity: ${programId}`);
   }
 
   const orderId = sanitizeSanityId(transaction.order_id);
@@ -177,6 +192,13 @@ function getSanityAuthDebug() {
     projectId: SANITY_PROJECT_ID,
     dataset: SANITY_DATASET,
   };
+}
+
+function setSecurityHeaders(res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Cache-Control', 'no-store');
 }
 
 function sanitizeSanityId(value) {

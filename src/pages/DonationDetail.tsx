@@ -183,6 +183,7 @@ const DonationDetail: React.FC = () => {
       const snap = await createMidtransSnapTransaction(transaction);
       const updatedTransaction = {
         ...transaction,
+        orderId: snap.orderId,
         midtransToken: snap.token,
         midtransRedirectUrl: snap.redirectUrl,
       };
