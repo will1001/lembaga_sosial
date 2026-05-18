@@ -8,6 +8,9 @@ import {
   Beef,
   BookOpen,
   Building2,
+  ChevronLeft,
+  ChevronRight,
+  X,
   Droplets,
   Filter,
   Grid3X3,
@@ -77,6 +80,9 @@ const Donation: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('Terkini');
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchDonations = async () => {
@@ -117,15 +123,46 @@ const Donation: React.FC = () => {
         ? donations
         : donations.filter((donation) => donation.category === selectedCategory);
 
-    return [...filtered].sort((a, b) => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+    const searched = normalizedSearch
+      ? filtered.filter((donation) => {
+          return [
+            donation.title,
+            donation.description,
+            donation.category,
+          ]
+            .join(' ')
+            .toLowerCase()
+            .includes(normalizedSearch);
+        })
+      : filtered;
+
+    return [...searched].sort((a, b) => {
       if (sortBy === 'Terkumpul') return b.current_amount - a.current_amount;
       if (sortBy === 'Target') return b.target_amount - a.target_amount;
       return new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime();
     });
-  }, [donations, selectedCategory, sortBy]);
+  }, [donations, searchQuery, selectedCategory, sortBy]);
 
   const featuredDonations = donations.filter((donation) => donation.featured).slice(0, 6);
-  const heroDonation = donations[0];
+  const heroDonations = featuredDonations.length > 0 ? featuredDonations : donations.slice(0, 6);
+  const heroDonation = heroDonations[activeSlide] || donations[0];
+
+  useEffect(() => {
+    if (activeSlide >= heroDonations.length) {
+      setActiveSlide(0);
+    }
+  }, [activeSlide, heroDonations.length]);
+
+  useEffect(() => {
+    if (heroDonations.length <= 1) return undefined;
+
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroDonations.length);
+    }, 5000);
+
+    return () => window.clearInterval(timer);
+  }, [heroDonations.length]);
 
   const progressPercentage = (current: number, target: number) => {
     if (!target) return 0;
@@ -152,6 +189,11 @@ const Donation: React.FC = () => {
   const cycleSort = () => {
     const currentIndex = sortOptions.indexOf(sortBy);
     setSortBy(sortOptions[(currentIndex + 1) % sortOptions.length]);
+  };
+
+  const changeSlide = (direction: 1 | -1) => {
+    if (heroDonations.length === 0) return;
+    setActiveSlide((current) => (current + direction + heroDonations.length) % heroDonations.length);
   };
 
   const donationImage = (donation: Donation, width: number, height: number) => {
@@ -187,8 +229,10 @@ const Donation: React.FC = () => {
                   <p className="mt-1 text-sm text-emerald-50">Program donasi pilihan</p>
                 </div>
                 <button
+                  onClick={() => setSearchOpen(true)}
                   className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-900 shadow-lg transition hover:bg-orange-50"
                   aria-label="Cari program"
+                  type="button"
                 >
                   <Search size={24} />
                 </button>
@@ -204,13 +248,102 @@ const Donation: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-white/40" />
-                <span className="h-2 w-6 rounded-full bg-orange-400" />
-                <span className="h-2 w-2 rounded-full bg-white/40" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  {heroDonations.map((donation, index) => (
+                    <button
+                      key={donation._id}
+                      type="button"
+                      onClick={() => setActiveSlide(index)}
+                      className={`h-2 rounded-full transition ${
+                        activeSlide === index ? 'w-6 bg-orange-400' : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                      aria-label={`Tampilkan slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {heroDonations.length > 1 && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => changeSlide(-1)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25"
+                      aria-label="Slide sebelumnya"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => changeSlide(1)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition hover:bg-white/25"
+                      aria-label="Slide berikutnya"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
+
+          {searchOpen && (
+            <div className="absolute inset-4 z-20 rounded-lg bg-white/95 p-5 shadow-xl backdrop-blur lg:inset-6 lg:p-8">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 flex-1 items-center gap-3 rounded-lg border border-stone-200 bg-white px-4">
+                  <Search size={22} className="text-slate-500" />
+                  <input
+                    autoFocus
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Cari program donasi"
+                    className="h-full min-w-0 flex-1 bg-transparent text-base font-medium text-slate-900 outline-none placeholder:text-slate-400"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="flex h-12 w-12 items-center justify-center rounded-lg border border-stone-200 bg-white text-slate-700 transition hover:bg-stone-50"
+                  aria-label="Tutup pencarian"
+                >
+                  <X size={22} />
+                </button>
+              </div>
+
+              <div className="mt-5 max-h-[175px] overflow-y-auto lg:max-h-[250px]">
+                {filteredDonations.slice(0, 6).map((donation) => (
+                  <Link
+                    key={donation._id}
+                    to={`/donasi/${donation.slug.current}`}
+                    onClick={() => setSearchOpen(false)}
+                    className="grid grid-cols-[64px_1fr] gap-3 border-b border-stone-100 py-3 transition hover:bg-orange-50"
+                  >
+                    <div className="h-16 overflow-hidden rounded-md bg-stone-200">
+                      {donation.image && (
+                        <img
+                          src={donationImage(donation, 128, 128)}
+                          alt={donation.title}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase text-orange-600">{donation.category}</p>
+                      <h3 className="mt-1 line-clamp-2 text-sm font-bold text-slate-950">{donation.title}</h3>
+                      <p className="mt-1 text-xs font-medium text-slate-600">{formatCurrency(donation.current_amount)}</p>
+                    </div>
+                  </Link>
+                ))}
+
+                {filteredDonations.length === 0 && (
+                  <p className="rounded-lg border border-dashed border-stone-300 bg-stone-50 px-4 py-8 text-center text-sm text-slate-500">
+                    Program tidak ditemukan.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="border-b border-stone-200 px-4 pb-5 lg:px-6">
