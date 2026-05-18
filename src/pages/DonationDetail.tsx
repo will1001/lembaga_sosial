@@ -46,6 +46,7 @@ interface Donation {
   featured: boolean;
   start_date?: string;
   end_date?: string;
+  records_count?: number;
   records?: DonationRecord[];
 }
 
@@ -78,7 +79,8 @@ const DonationDetail: React.FC = () => {
           featured,
           start_date,
           end_date,
-          "records": *[_type == "donation_record" && references(^._id) && payment_status == "success"] | order(created_at desc)[0...5] {
+          "records_count": count(*[_type == "donation_record" && references(^._id) && payment_status in ["success", "settlement", "capture"]]),
+          "records": *[_type == "donation_record" && references(^._id) && payment_status in ["success", "settlement", "capture"]] | order(created_at desc)[0...5] {
             _id,
             donor_name,
             amount,
@@ -122,9 +124,14 @@ const DonationDetail: React.FC = () => {
   const getDaysLeft = (endDate?: string) => {
     if (!endDate) return 'Terbuka';
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const end = new Date(endDate);
+    if (Number.isNaN(end.getTime())) return 'Terbuka';
+    end.setHours(23, 59, 59, 999);
     const days = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return days > 0 ? `${days} Hari lagi` : 'Berakhir';
+    if (days > 1) return `${days} Hari lagi`;
+    if (days === 1) return 'Hari ini';
+    return 'Berakhir';
   };
 
   const openDonationForm = () => {
@@ -215,6 +222,7 @@ const DonationDetail: React.FC = () => {
   }
 
   const progress = progressPercentage(donation.current_amount, donation.target_amount);
+  const displayedDonorsCount = Math.max(donation.donors_count || 0, donation.records_count || 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-amber-50 pb-20 lg:pb-0">
@@ -258,7 +266,7 @@ const DonationDetail: React.FC = () => {
                   <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-tr-2xl rounded-bl-2xl border border-amber-200 bg-amber-50 text-amber-700">
                     <Users size={21} />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{donation.donors_count}</div>
+                  <div className="text-lg font-bold text-gray-900">{displayedDonorsCount}</div>
                   <div className="text-xs text-gray-600">Donatur</div>
                 </div>
                 <div className="text-center">
