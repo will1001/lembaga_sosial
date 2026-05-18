@@ -85,6 +85,71 @@ const categories: Category[] = [
 const sortOptions = ['Terkini', 'Terkumpul', 'Target'] as const;
 type SortOption = (typeof sortOptions)[number];
 
+const fallbackDonationImages: Record<string, string[]> = {
+  pendidikan: [
+    'https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg',
+    'https://images.pexels.com/photos/5792639/pexels-photo-5792639.jpeg',
+  ],
+  kesehatan: [
+    'https://images.pexels.com/photos/8942991/pexels-photo-8942991.jpeg',
+    'https://images.pexels.com/photos/3867300/pexels-photo-3867300.jpeg',
+  ],
+  sedekah: [
+    'https://images.pexels.com/photos/6647037/pexels-photo-6647037.jpeg',
+    'https://images.pexels.com/photos/6647118/pexels-photo-6647118.jpeg',
+  ],
+  kemanusiaan: [
+    'https://images.pexels.com/photos/8423302/pexels-photo-8423302.jpeg',
+    'https://images.pexels.com/photos/8849277/pexels-photo-8849277.jpeg',
+  ],
+  kurban: [
+    'https://images.pexels.com/photos/4207908/pexels-photo-4207908.jpeg',
+    'https://images.pexels.com/photos/4911715/pexels-photo-4911715.jpeg',
+  ],
+  palestina: [
+    'https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg',
+    'https://images.pexels.com/photos/8942851/pexels-photo-8942851.jpeg',
+  ],
+  zakat: [
+    'https://images.pexels.com/photos/6994985/pexels-photo-6994985.jpeg',
+    'https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg',
+  ],
+  sosial: [
+    'https://images.pexels.com/photos/6647038/pexels-photo-6647038.jpeg',
+    'https://images.pexels.com/photos/8423425/pexels-photo-8423425.jpeg',
+  ],
+  bencana: [
+    'https://images.pexels.com/photos/8944484/pexels-photo-8944484.jpeg',
+    'https://images.pexels.com/photos/8848952/pexels-photo-8848952.jpeg',
+  ],
+  'donasi-rutin': [
+    'https://images.pexels.com/photos/6994926/pexels-photo-6994926.jpeg',
+    'https://images.pexels.com/photos/9421664/pexels-photo-9421664.jpeg',
+  ],
+  lainnya: [
+    'https://images.pexels.com/photos/9420711/pexels-photo-9420711.jpeg',
+    'https://images.pexels.com/photos/2982449/pexels-photo-2982449.jpeg',
+  ],
+};
+
+const fallbackImagePool = Object.values(fallbackDonationImages).flat();
+
+const getImageAssetRef = (image: unknown) => {
+  if (!image || typeof image !== 'object') return undefined;
+  const asset = (image as { asset?: { _ref?: string; _id?: string } }).asset;
+  return asset?._ref || asset?._id;
+};
+
+const getFallbackImage = (donation: Donation, index: number) => {
+  const categoryImages = fallbackDonationImages[donation.category] || fallbackImagePool;
+  return categoryImages[index % categoryImages.length] || fallbackImagePool[index % fallbackImagePool.length];
+};
+
+const formatRemoteImage = (imageUrl: string, width: number, height: number) => {
+  const separator = imageUrl.includes('?') ? '&' : '?';
+  return `${imageUrl}${separator}auto=compress&cs=tinysrgb&w=${width}&h=${height}&fit=crop&dpr=2`;
+};
+
 const Donation: React.FC = () => {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +222,15 @@ const Donation: React.FC = () => {
   const featuredDonations = donations.filter((donation) => donation.featured).slice(0, 6);
   const heroDonations = featuredDonations.length > 0 ? featuredDonations : donations.slice(0, 6);
   const heroDonation = heroDonations[activeSlide] || donations[0];
+  const imageAssetUsage = useMemo(() => {
+    return donations.reduce<Record<string, number>>((usage, donation) => {
+      const assetRef = getImageAssetRef(donation.image);
+      if (assetRef) {
+        usage[assetRef] = (usage[assetRef] || 0) + 1;
+      }
+      return usage;
+    }, {});
+  }, [donations]);
 
   useEffect(() => {
     if (activeSlide >= heroDonations.length) {
@@ -206,8 +280,12 @@ const Donation: React.FC = () => {
     setActiveSlide((current) => (current + direction + heroDonations.length) % heroDonations.length);
   };
 
-  const donationImage = (donation: Donation, width: number, height: number) => {
-    if (!donation.image) return '';
+  const donationImage = (donation: Donation, width: number, height: number, index = 0) => {
+    const assetRef = getImageAssetRef(donation.image);
+    const hasRepeatedImage = assetRef ? imageAssetUsage[assetRef] > 1 : false;
+    if (!donation.image || hasRepeatedImage) {
+      return formatRemoteImage(getFallbackImage(donation, index), width, height);
+    }
     return urlFor(donation.image).width(width).height(height).fit('crop').url();
   };
 
@@ -224,9 +302,9 @@ const Donation: React.FC = () => {
       <div className="mx-auto max-w-[480px] bg-white shadow-xl md:my-6 md:rounded-lg md:border md:border-stone-200 lg:max-w-6xl">
         <section className="relative p-4 lg:p-6">
           <div className="relative min-h-[260px] overflow-hidden rounded-lg bg-emerald-900 lg:min-h-[360px]">
-            {heroDonation?.image && (
+            {heroDonation && (
               <img
-                src={donationImage(heroDonation, 1200, 560)}
+                src={donationImage(heroDonation, 1200, 560, activeSlide)}
                 alt={heroDonation.title}
                 className="absolute inset-0 h-full w-full object-cover"
               />
@@ -322,7 +400,7 @@ const Donation: React.FC = () => {
               </div>
 
               <div className="mt-5 max-h-[175px] overflow-y-auto lg:max-h-[250px]">
-                {filteredDonations.slice(0, 6).map((donation) => (
+                {filteredDonations.slice(0, 6).map((donation, index) => (
                   <Link
                     key={donation._id}
                     to={`/donasi/${donation.slug.current}`}
@@ -330,13 +408,11 @@ const Donation: React.FC = () => {
                     className="grid grid-cols-[64px_1fr] gap-3 border-b border-stone-100 py-3 transition hover:bg-orange-50"
                   >
                     <div className="h-16 overflow-hidden rounded-md bg-stone-200">
-                      {donation.image && (
-                        <img
-                          src={donationImage(donation, 128, 128)}
-                          alt={donation.title}
-                          className="h-full w-full object-cover"
-                        />
-                      )}
+                      <img
+                        src={donationImage(donation, 128, 128, index)}
+                        alt={donation.title}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase text-orange-600">{donation.category}</p>
@@ -403,20 +479,18 @@ const Donation: React.FC = () => {
           </div>
 
           <div className="flex gap-3 overflow-x-auto pb-3">
-            {featuredDonations.map((donation) => (
+            {featuredDonations.map((donation, index) => (
               <Link
                 key={donation._id}
                 to={`/donasi/${donation.slug.current}`}
                 className="w-[190px] shrink-0 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:border-orange-300"
               >
                 <div className="h-[106px] bg-stone-200">
-                  {donation.image && (
-                    <img
-                      src={donationImage(donation, 380, 220)}
-                      alt={donation.title}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
+                  <img
+                    src={donationImage(donation, 380, 220, index)}
+                    alt={donation.title}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div className="p-3">
                   <h3 className="line-clamp-2 min-h-[40px] text-sm font-bold leading-tight text-slate-950">
@@ -478,13 +552,11 @@ const Donation: React.FC = () => {
                   className="grid min-h-[118px] grid-cols-[42%_1fr] overflow-hidden rounded-lg border border-stone-200 bg-white transition hover:border-orange-300 hover:shadow-md"
                 >
                   <div className="bg-stone-200">
-                    {donation.image && (
-                      <img
-                        src={donationImage(donation, 420, 260)}
-                        alt={donation.title}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
+                    <img
+                      src={donationImage(donation, 420, 260, index)}
+                      alt={donation.title}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="flex flex-col justify-between p-3">
                     <div>
