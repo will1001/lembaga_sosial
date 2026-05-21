@@ -468,6 +468,25 @@ const Donation: React.FC = () => {
         </section>
 
         <section className="border-b border-stone-200 px-4 py-5 lg:px-6">
+          <div className="rounded-lg border border-amber-100 bg-amber-50 p-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-amber-700">
+              Tujuan Donasi
+            </p>
+            <h2 className="mt-2 text-lg font-bold text-slate-950">
+              Dana digunakan untuk program sosial yang dipilih donatur
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+              Setiap program donasi menampilkan tujuan penyaluran, target dana dalam Rupiah Indonesia (IDR),
+              dana terkumpul, dan informasi penerima manfaat. Donatur dapat membuka detail program untuk
+              melihat penggunaan dana sebelum melanjutkan pembayaran.
+            </p>
+            <Link to="/cara-berdonasi" className="mt-3 inline-block text-sm font-bold text-amber-700 hover:text-amber-800">
+              Lihat cara berdonasi
+            </Link>
+          </div>
+        </section>
+
+        <section className="border-b border-stone-200 px-4 py-5 lg:px-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-950">Program Pilihan</h2>
             <button

@@ -352,6 +352,10 @@ const DonationForm: React.FC<DonationFormProps> = ({ programId, programTitle, on
               <Link to="/kebijakan-pengembalian-dana" className="text-amber-700 font-medium hover:text-amber-800">
                 kebijakan pengembalian dana
               </Link>
+              , dan memahami{' '}
+              <Link to="/cara-berdonasi" className="text-amber-700 font-medium hover:text-amber-800">
+                cara berdonasi
+              </Link>
               .
             </span>
           </label>

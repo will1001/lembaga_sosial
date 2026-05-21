@@ -140,6 +140,14 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
+                  to="/cara-berdonasi"
+                  className="text-gray-300 hover:text-yellow-500 transition-colors"
+                >
+                  Cara Berdonasi
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/syarat-ketentuan"
                   className="text-gray-300 hover:text-yellow-500 transition-colors"
                 >

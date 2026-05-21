@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Clock,
   Copy,
+  FileText,
   HandCoins,
   Share2,
   UserCircle,
@@ -21,6 +22,53 @@ const builder = imageUrlBuilder(client);
 function urlFor(source: any) {
   return builder.image(source);
 }
+
+const donationPurposeByCategory: Record<string, string[]> = {
+  pendidikan: [
+    'Membantu biaya pendidikan, perlengkapan sekolah, dan kebutuhan belajar anak dari keluarga prasejahtera.',
+    'Mendukung akses pendidikan yang lebih layak agar penerima manfaat dapat terus bersekolah.',
+  ],
+  kesehatan: [
+    'Membantu akses layanan kesehatan dasar, pemeriksaan, obat-obatan, dan kebutuhan pendampingan pasien dhuafa.',
+    'Mendukung kegiatan layanan kesehatan sosial yang ditujukan untuk masyarakat rentan.',
+  ],
+  sedekah: [
+    'Menyalurkan bantuan kebutuhan pokok dan dukungan sosial untuk keluarga prasejahtera.',
+    'Membantu penerima manfaat memenuhi kebutuhan harian secara lebih layak.',
+  ],
+  zakat: [
+    'Menghimpun dan menyalurkan dana zakat kepada penerima manfaat sesuai ketentuan program yang berjalan.',
+    'Mendukung distribusi bantuan sosial kepada kelompok penerima yang membutuhkan.',
+  ],
+  bencana: [
+    'Membantu kebutuhan darurat, logistik, dan pemulihan awal untuk masyarakat terdampak bencana.',
+    'Mendukung penyaluran bantuan cepat sesuai kondisi lapangan.',
+  ],
+  kurban: [
+    'Mendukung pengadaan dan penyaluran hewan kurban kepada masyarakat penerima manfaat.',
+    'Memperluas manfaat kurban kepada keluarga yang membutuhkan.',
+  ],
+  palestina: [
+    'Mendukung bantuan kemanusiaan untuk masyarakat terdampak krisis melalui program penyaluran yang relevan.',
+    'Membantu pemenuhan kebutuhan dasar penerima manfaat sesuai perkembangan kondisi lapangan.',
+  ],
+  kemanusiaan: [
+    'Mendukung program bantuan kemanusiaan untuk masyarakat rentan dan keluarga prasejahtera.',
+    'Membantu pemenuhan kebutuhan mendesak sesuai tujuan program sosial yang dipilih.',
+  ],
+  sosial: [
+    'Mendukung kegiatan sosial, pemberdayaan, dan bantuan langsung bagi masyarakat prasejahtera.',
+    'Menyalurkan dukungan untuk kebutuhan penerima manfaat sesuai program yang berjalan.',
+  ],
+  'donasi-rutin': [
+    'Mendukung keberlanjutan program sosial secara rutin agar penyaluran bantuan dapat berjalan konsisten.',
+    'Membantu operasional penyaluran dan pelaksanaan program manfaat secara berkala.',
+  ],
+  lainnya: [
+    'Mendukung tujuan sosial program sesuai informasi yang tertera pada halaman detail donasi.',
+    'Membantu penyaluran dana kepada penerima manfaat yang membutuhkan sesuai kebutuhan program.',
+  ],
+};
 
 interface DonationRecord {
   _id: string;
@@ -224,6 +272,7 @@ const DonationDetail: React.FC = () => {
 
   const progress = progressPercentage(donation.current_amount, donation.target_amount);
   const displayedDonorsCount = Math.max(donation.donors_count || 0, donation.records_count || 0);
+  const donationPurpose = donationPurposeByCategory[donation.category] || donationPurposeByCategory.lainnya;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-amber-50 pb-20 lg:pb-0">
@@ -301,6 +350,41 @@ const DonationDetail: React.FC = () => {
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08 }}
+              className="bg-white rounded-xl shadow-lg p-6"
+            >
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                  <FileText size={22} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Tujuan Donasi</h2>
+                  <p className="text-sm text-gray-600">Informasi penggunaan dana untuk program ini.</p>
+                </div>
+              </div>
+              <p className="leading-relaxed text-gray-700">
+                Donasi untuk <span className="font-semibold text-gray-950">{donation.title}</span> dihimpun
+                dalam Rupiah Indonesia (IDR) dan digunakan untuk mendukung tujuan program yang dipilih donatur.
+                {donation.description ? ` ${donation.description}` : ''}
+              </p>
+              <ul className="mt-4 space-y-3">
+                {donationPurpose.map((purpose) => (
+                  <li key={purpose} className="flex gap-3 text-gray-700">
+                    <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber-600" />
+                    <span>{purpose}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+                Target dana program ini adalah <span className="font-bold">{formatCurrency(donation.target_amount)}</span>.
+                Dana yang terkumpul akan diproses untuk penyaluran program, pelaporan, dan kebutuhan pelaksanaan
+                yang relevan dengan tujuan donasi.
               </div>
             </motion.div>
 
