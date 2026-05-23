@@ -26,16 +26,13 @@ type Program = {
   desc?: string;
 };
 
-const fallbackHomeImage =
-  "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1600";
-
 const Home: React.FC = () => {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [program, setProgram] = useState<Program[]>([]);
 
   const homeImageUrl = dashboard?.home_image
     ? urlFor(dashboard.home_image).width(1600).auto("format").url()
-    : fallbackHomeImage;
+    : undefined;
 
   useEffect(() => {
     sanity
@@ -65,9 +62,9 @@ const Home: React.FC = () => {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/40 z-10"></div>
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-gray-900 bg-cover bg-center"
           style={{
-            backgroundImage: `url("${homeImageUrl}")`,
+            backgroundImage: homeImageUrl ? `url("${homeImageUrl}")` : undefined,
           }}
         ></div>
 
