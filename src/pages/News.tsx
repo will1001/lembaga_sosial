@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Search, User } from 'lucide-react';
+import { ArrowRight, Calendar, Search, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { sanity, urlFor } from '../sanityClient';
 import type { SanityImageSource } from '../sanityClient';
@@ -164,7 +164,9 @@ const News: React.FC = () => {
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">
                     {featuredArticle.title}
                   </h2>
-                  <p className="text-gray-700 mb-6">{featuredArticle.excerpt}</p>
+                  <p className="text-gray-700 mb-6 line-clamp-4">
+                    {featuredArticle.excerpt}
+                  </p>
                   <div className="flex items-center text-gray-500 text-sm mb-6">
                     <Calendar size={16} className="mr-1" />
                     <span className="mr-4">
@@ -177,7 +179,7 @@ const News: React.FC = () => {
                     to={`/berita/${featuredArticle.slug?.current || featuredArticle._id}`}
                     className="inline-flex items-center text-yellow-500 font-medium hover:text-yellow-600"
                   >
-                    Baca Selengkapnya
+                    Baca Selengkapnya <ArrowRight size={16} className="ml-2" />
                   </Link>
                 </div>
               </div>
@@ -219,7 +221,9 @@ const News: React.FC = () => {
                       {article.category}
                     </span>
                     <h3 className="text-xl font-bold mb-3">{article.title}</h3>
-                    <p className="text-gray-700 mb-4">{article.excerpt}</p>
+                    <p className="text-gray-700 mb-4 line-clamp-5">
+                      {article.excerpt}
+                    </p>
                     <div className="flex items-center text-gray-500 text-sm mb-4">
                       <Calendar size={16} className="mr-1" />
                       <span className="mr-4">
@@ -228,6 +232,9 @@ const News: React.FC = () => {
                       <User size={16} className="mr-1" />
                       <span>{article.author}</span>
                     </div>
+                    <span className="inline-flex items-center font-medium text-yellow-500 hover:text-yellow-600">
+                      Baca Selengkapnya <ArrowRight size={16} className="ml-2" />
+                    </span>
                   </div>
                 </Link>
               </motion.div>
