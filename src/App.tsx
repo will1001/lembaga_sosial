@@ -8,6 +8,7 @@ import Programs from './pages/Programs';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import News from './pages/News';
+import NewsDetail from './pages/NewsDetail';
 import Donation from './pages/Donation';
 import DonationDetail from './pages/DonationDetail';
 import DonationGuide from './pages/DonationGuide';
@@ -27,6 +28,7 @@ function App() {
           <Route path="/galeri" element={<Gallery />} />
           <Route path="/kontak" element={<Contact />} />
           <Route path="/berita" element={<News />} />
+          <Route path="/berita/:slug" element={<NewsDetail />} />
           <Route path="/donasi" element={<Donation />} />
           <Route path="/cara-berdonasi" element={<DonationGuide />} />
           <Route path="/donasi/:slug" element={<DonationDetail />} />

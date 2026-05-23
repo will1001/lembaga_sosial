@@ -7,6 +7,7 @@ import type { SanityImageSource } from '../sanityClient';
 
 interface NewsArticle {
   _id: string;
+  slug?: { current?: string };
   title: string;
   excerpt: string;
   date: string;
@@ -158,6 +159,12 @@ const News: React.FC = () => {
                     <User size={16} className="mr-1" />
                     <span>{featuredArticle.author}</span>
                   </div>
+                  <Link
+                    to={`/berita/${featuredArticle.slug?.current || featuredArticle._id}`}
+                    className="inline-flex items-center text-yellow-500 font-medium hover:text-yellow-600"
+                  >
+                    Baca Selengkapnya
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -180,28 +187,33 @@ const News: React.FC = () => {
                 viewport={{ once: true }}
                 className="bg-white rounded-lg shadow-lg overflow-hidden"
               >
-                <div className="h-48 overflow-hidden">
-                  {article.image && (
-                    <img
-                      src={urlFor(article.image).width(400).url()}
-                      alt={article.title}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                  )}
-                </div>
-                <div className="p-6">
-                  <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
-                    {article.category}
-                  </span>
-                  <h3 className="text-xl font-bold mb-3">{article.title}</h3>
-                  <p className="text-gray-700 mb-4">{article.excerpt}</p>
-                  <div className="flex items-center text-gray-500 text-sm mb-4">
-                    <Calendar size={16} className="mr-1" />
-                    <span className="mr-4">{formatDate(article.date)}</span>
-                    <User size={16} className="mr-1" />
-                    <span>{article.author}</span>
+                <Link
+                  to={`/berita/${article.slug?.current || article._id}`}
+                  className="block h-full"
+                >
+                  <div className="h-48 overflow-hidden">
+                    {article.image && (
+                      <img
+                        src={urlFor(article.image).width(400).url()}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                      />
+                    )}
                   </div>
-                </div>
+                  <div className="p-6">
+                    <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                      {article.category}
+                    </span>
+                    <h3 className="text-xl font-bold mb-3">{article.title}</h3>
+                    <p className="text-gray-700 mb-4">{article.excerpt}</p>
+                    <div className="flex items-center text-gray-500 text-sm mb-4">
+                      <Calendar size={16} className="mr-1" />
+                      <span className="mr-4">{formatDate(article.date)}</span>
+                      <User size={16} className="mr-1" />
+                      <span>{article.author}</span>
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
