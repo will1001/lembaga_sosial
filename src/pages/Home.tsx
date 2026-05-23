@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { sanity, urlFor } from "../sanityClient";
-import type { SanityImageSource } from "@sanity/image-url";
+import type { SanityImageSource } from "../sanityClient";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
                 <span className="text-yellow-500">Cahaya Untuk Negeri</span>
               </h2>
 
-              <PortableText value={dashboard?.about} />
+              <PortableText value={dashboard?.about ?? []} />
               <Link
                 to="/tentang-kami"
                 className="inline-flex items-center text-yellow-500 hover:text-yellow-600 font-medium"
@@ -163,9 +163,9 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {program?.map((item, index) => (
+            {program.map((item) => (
               <motion.div
-                key={index}
+                key={`${item.category}-${item.desc}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -173,11 +173,13 @@ const Home: React.FC = () => {
                 className="bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="h-48 overflow-hidden">
-                  <img
-                    src={urlFor(item?.image).url()}
-                    alt="Program Pendidikan"
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                  />
+                  {item.image && (
+                    <img
+                      src={urlFor(item.image).url()}
+                      alt={item.category || "Program Cahaya Untuk Negeri"}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  )}
                 </div>
                 <div className="p-6">
                   <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4">

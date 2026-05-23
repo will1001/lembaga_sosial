@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart, Sun } from "lucide-react";
+import { Menu, X, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import Logo from "./Logo";
 

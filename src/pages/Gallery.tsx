@@ -1,107 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { sanity, urlFor } from "../sanityClient";
+import type { SanityImageSource } from "../sanityClient";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 
 interface GalleryImage {
-  id: number;
-  src: string;
-  alt: string;
-  category: string;
+  _id: string;
+  src?: SanityImageSource;
+  category?: string;
 }
 
 const Gallery: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
 
-  const [gallery, setGallery] = useState();
   useEffect(() => {
-    sanity.fetch(`*[_type == "gallery"]`).then((data) => {
+    sanity.fetch<GalleryImage[]>(`*[_type == "gallery"] | order(_updatedAt desc)`).then((data) => {
       if (data && data.length > 0) {
-        setGallery(data); // Ambil yang pertama
+        setGallery(data);
       }
     });
   }, []);
 
-  const images: GalleryImage[] = [
-    {
-      id: 1,
-      src: "https://images.pexels.com/photos/8423302/pexels-photo-8423302.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Kegiatan Beasiswa",
-      category: "pendidikan",
-    },
-    {
-      id: 2,
-      src: "https://images.pexels.com/photos/8423425/pexels-photo-8423425.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Program Kewirausahaan",
-      category: "ekonomi",
-    },
-    {
-      id: 3,
-      src: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Program Kesehatan",
-      category: "kesehatan",
-    },
-    {
-      id: 4,
-      src: "https://images.pexels.com/photos/8942991/pexels-photo-8942991.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Perpustakaan Anak",
-      category: "pendidikan",
-    },
-    {
-      id: 5,
-      src: "https://images.pexels.com/photos/9421664/pexels-photo-9421664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Pelatihan Keterampilan",
-      category: "ekonomi",
-    },
-    {
-      id: 6,
-      src: "https://images.pexels.com/photos/8944484/pexels-photo-8944484.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Kegiatan Relawan",
-      category: "relawan",
-    },
-    {
-      id: 7,
-      src: "https://images.pexels.com/photos/8849277/pexels-photo-8849277.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Kegiatan Sosial",
-      category: "sosial",
-    },
-    {
-      id: 8,
-      src: "https://images.pexels.com/photos/6647118/pexels-photo-6647118.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Klinik Kesehatan",
-      category: "kesehatan",
-    },
-    {
-      id: 9,
-      src: "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Beasiswa Anak",
-      category: "pendidikan",
-    },
-    {
-      id: 10,
-      src: "https://images.pexels.com/photos/8942851/pexels-photo-8942851.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Kegiatan Belajar",
-      category: "pendidikan",
-    },
-    {
-      id: 11,
-      src: "https://images.pexels.com/photos/6647037/pexels-photo-6647037.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Program Kesehatan Masyarakat",
-      category: "kesehatan",
-    },
-    {
-      id: 12,
-      src: "https://images.pexels.com/photos/8848952/pexels-photo-8848952.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-      alt: "Pelatihan Wirausaha",
-      category: "ekonomi",
-    },
-  ];
-
+  const categories = Array.from(
+    new Set(gallery.map((image) => image.category).filter(Boolean))
+  );
   const filteredImages =
     filter === "all"
-      ? images
-      : images.filter((image) => image.category === filter);
+      ? gallery
+      : gallery.filter((image) => image.category === filter);
 
   const openModal = (image: GalleryImage) => {
     setSelectedImage(image);
@@ -142,74 +70,39 @@ const Gallery: React.FC = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           {/* Filter Buttons */}
-          {/* <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <button 
-              onClick={() => setFilter('all')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'all' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Semua
-            </button>
-            <button 
-              onClick={() => setFilter('pendidikan')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'pendidikan' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Pendidikan
-            </button>
-            <button 
-              onClick={() => setFilter('ekonomi')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'ekonomi' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Ekonomi
-            </button>
-            <button 
-              onClick={() => setFilter('kesehatan')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'kesehatan' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Kesehatan
-            </button>
-            <button 
-              onClick={() => setFilter('relawan')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'relawan' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Relawan
-            </button>
-            <button 
-              onClick={() => setFilter('sosial')}
-              className={`px-6 py-2 rounded-full transition-colors duration-300 ${
-                filter === 'sosial' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              Sosial
-            </button>
-          </div> */}
+          {categories.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-6 py-2 rounded-full transition-colors duration-300 ${
+                  filter === "all"
+                    ? "bg-yellow-500 text-white"
+                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                }`}
+              >
+                Semua
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setFilter(category || "all")}
+                  className={`px-6 py-2 rounded-full capitalize transition-colors duration-300 ${
+                    filter === category
+                      ? "bg-yellow-500 text-white"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Images Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {gallery?.map((image, index) => (
+            {filteredImages.map((image) => (
               <motion.div
-                key={index}
+                key={image._id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
@@ -221,13 +114,15 @@ const Gallery: React.FC = () => {
                   {image.src && (
                     <img
                       src={urlFor(image.src).url()}
-                      alt={image.category}
+                      alt={image.category || "Galeri Cahaya Untuk Negeri"}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                     />
                   )}
                 </div>
                 <div className="p-4 bg-white">
-                  <p className="text-gray-800 font-medium">{image.category}</p>
+                  <p className="text-gray-800 font-medium">
+                    {image.category}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -243,13 +138,17 @@ const Gallery: React.FC = () => {
                 >
                   <X size={24} />
                 </button>
-                <img
-                  src={selectedImage.src}
-                  alt={selectedImage.alt}
-                  className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-                />
+                {selectedImage.src && (
+                  <img
+                    src={urlFor(selectedImage.src).width(1200).auto("format").url()}
+                    alt={selectedImage.category || "Galeri Cahaya Untuk Negeri"}
+                    className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                  />
+                )}
                 <div className="mt-4 bg-white p-4 rounded-lg">
-                  <p className="text-lg font-medium">{selectedImage.alt}</p>
+                  <p className="text-lg font-medium">
+                    {selectedImage.category}
+                  </p>
                 </div>
               </div>
             </div>

@@ -8,17 +8,22 @@ import {
   Instagram,
   Facebook,
   Youtube,
-  Heart,
 } from "lucide-react";
 import Logo from "./Logo";
 
+type ContactProfile = {
+  address?: string;
+  phone?: string;
+  email?: string;
+};
+
 const Footer: React.FC = () => {
-   const [contact, setContact] = useState();
+   const [contact, setContact] = useState<ContactProfile | null>(null);
   
     useEffect(() => {
-      sanity.fetch(`*[_type == "contact_profile"]`).then((data) => {
+      sanity.fetch<ContactProfile[]>(`*[_type == "contact_profile"]`).then((data) => {
         if (data && data.length > 0) {
-          setContact(data[0]); // Ambil yang pertama
+          setContact(data[0]);
         }
       });
     }, []);

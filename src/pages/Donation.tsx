@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../sanityClient';
+import type { SanityImageSource } from '../sanityClient';
 import imageUrlBuilder from '@sanity/image-url';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -29,7 +30,7 @@ import { motion } from 'framer-motion';
 
 const builder = imageUrlBuilder(client);
 
-function urlFor(source: unknown) {
+function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
@@ -49,7 +50,7 @@ interface Donation {
   title: string;
   slug: { current: string };
   description: string;
-  image: unknown;
+  image: SanityImageSource;
   content: unknown;
   target_amount: number;
   current_amount: number;

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { client } from '../sanityClient';
+import type { SanityImageSource } from '../sanityClient';
 import imageUrlBuilder from '@sanity/image-url';
 import { PortableText } from '@portabletext/react';
+import type { PortableTextBlock } from '@portabletext/types';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -19,7 +21,7 @@ import DonationForm, { DonationSubmitData } from '../components/DonationForm';
 import { createDonationTransaction, createMidtransSnapTransaction, saveDonationTransaction } from '../utils/payment';
 
 const builder = imageUrlBuilder(client);
-function urlFor(source: any) {
+function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
@@ -84,8 +86,8 @@ interface Donation {
   title: string;
   slug: { current: string };
   description: string;
-  image: any;
-  content: any;
+  image: SanityImageSource;
+  content?: PortableTextBlock[];
   target_amount: number;
   current_amount: number;
   donors_count: number;
@@ -398,7 +400,7 @@ const DonationDetail: React.FC = () => {
               <div className="relative">
                 <div className={`prose prose-lg max-w-none overflow-hidden transition-all ${showDescriptionFull ? '' : 'max-h-64'}`}>
                   <PortableText
-                    value={donation.content}
+                    value={donation.content ?? []}
                     components={{
                       block: {
                         normal: ({ children }) => (

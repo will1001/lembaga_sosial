@@ -1,6 +1,10 @@
 import React from "react";
 
-const Logo: React.FC = ({ color }) => {
+type LogoProps = {
+  color?: "white" | "black";
+};
+
+const Logo: React.FC<LogoProps> = ({ color }) => {
   return (
     <div className="relative flex items-center justify-center">
       <img

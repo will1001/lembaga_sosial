@@ -3,6 +3,12 @@ import { sanity } from '../sanityClient'
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Send } from 'lucide-react';
 
+type ContactProfile = {
+  address?: string;
+  phone?: string;
+  email?: string;
+};
+
 const Contact: React.FC = () => {
   const [formState, setFormState] = useState({
     name: '',
@@ -47,12 +53,12 @@ const Contact: React.FC = () => {
   };
 
 
-   const [contact, setContact] = useState();
+   const [contact, setContact] = useState<ContactProfile | null>(null);
     
       useEffect(() => {
-        sanity.fetch(`*[_type == "contact_profile"]`).then((data) => {
+        sanity.fetch<ContactProfile[]>(`*[_type == "contact_profile"]`).then((data) => {
           if (data && data.length > 0) {
-            setContact(data[0]); // Ambil yang pertama
+            setContact(data[0]);
           }
         });
       }, []);

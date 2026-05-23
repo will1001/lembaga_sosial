@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { sanity, urlFor } from "../sanityClient";
+import type { SanityImageSource } from "../sanityClient";
 
 import { motion } from "framer-motion";
 import {
-  BookOpen,
   Heart,
   Users,
   GraduationCap,
   Landmark,
-  Leaf,
   Clock,
 } from "lucide-react";
 
+type ProgramItem = {
+  _id: string;
+  image?: SanityImageSource;
+  category?: string;
+  desc?: string;
+};
+
 const Programs: React.FC = () => {
-  const [program, setProgram] = useState();
+  const [program, setProgram] = useState<ProgramItem[]>([]);
   useEffect(() => {
-    sanity.fetch(`*[_type == "program"]`).then((data) => {
+    sanity.fetch<ProgramItem[]>(`*[_type == "program"] | order(_updatedAt desc)`).then((data) => {
       if (data && data.length > 0) {
-        setProgram(data); // Ambil yang pertama
+        setProgram(data);
       }
     });
   }, []);
@@ -61,8 +67,9 @@ const Programs: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {program?.map((item, index) => (
+            {program.map((item) => (
               <motion.div
+                key={item._id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -70,11 +77,13 @@ const Programs: React.FC = () => {
                 className="bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <div className="h-48 overflow-hidden">
-                  <img
-                    src={urlFor(item?.image).url()}
-                    alt="Program Pendidikan"
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                  />
+                  {item.image && (
+                    <img
+                      src={urlFor(item.image).url()}
+                      alt={item.category || "Program Cahaya Untuk Negeri"}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  )}
                 </div>
                 <div className="p-6">
                   <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4">

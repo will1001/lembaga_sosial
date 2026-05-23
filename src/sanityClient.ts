@@ -2,7 +2,6 @@
 // src/sanityClient.ts
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
-import type { SanityImageSource } from '@sanity/image-url'
 
 export const sanity = createClient({
   projectId: 'yhzk3e66',     // ganti dengan ID project kamu
@@ -14,6 +13,8 @@ export const sanity = createClient({
 export const client = sanity;
 
 const builder = imageUrlBuilder(sanity)
+
+export type SanityImageSource = Parameters<typeof builder.image>[0]
 
 export function urlFor(source: SanityImageSource) {
   return builder.image(source)
