@@ -1,35 +1,60 @@
 import React, { useEffect, useState } from "react";
 import { sanity, urlFor } from "../sanityClient";
+import type { SanityImageSource } from "@sanity/image-url";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
   Heart,
   BookOpen,
-  Users,
-  GraduationCap,
   SunMedium,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PortableText } from "@portabletext/react";
+import type { PortableTextBlock } from "@portabletext/types";
+
+type Dashboard = {
+  home_image?: SanityImageSource;
+  home_title?: string;
+  home_desc?: string;
+  about?: PortableTextBlock[];
+  about_image?: SanityImageSource;
+};
+
+type Program = {
+  image?: SanityImageSource;
+  category?: string;
+  desc?: string;
+};
+
+const fallbackHomeImage =
+  "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1600";
 
 const Home: React.FC = () => {
-  const [dashboard, setDashboard] = useState();
-  const [program, setProgram] = useState();
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const [program, setProgram] = useState<Program[]>([]);
+
+  const homeImageUrl = dashboard?.home_image
+    ? urlFor(dashboard.home_image).width(1600).auto("format").url()
+    : fallbackHomeImage;
 
   useEffect(() => {
-    sanity.fetch(`*[_type == "dashboard"]`).then((data) => {
-      if (data && data.length > 0) {
-        setDashboard(data[0]); // Ambil yang pertama
-      }
-    });
+    sanity
+      .fetch<Dashboard | null>(
+        `*[_type == "dashboard"] | order(_updatedAt desc)[0]`
+      )
+      .then((data) => {
+        if (data) {
+          setDashboard(data);
+        }
+      });
   }, []);
 
   useEffect(() => {
     sanity
-      .fetch(`*[_type == "program" && featured == true][0...3]`)
+      .fetch<Program[]>(`*[_type == "program" && featured == true][0...3]`)
       .then((data) => {
         if (data && data.length > 0) {
-          setProgram(data); // Ambil yang pertama
+          setProgram(data);
         }
       });
   }, []);
@@ -42,8 +67,7 @@ const Home: React.FC = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url('https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1600')",
+            backgroundImage: `url("${homeImageUrl}")`,
           }}
         ></div>
 
