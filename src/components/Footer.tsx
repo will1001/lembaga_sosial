@@ -127,14 +127,14 @@ const Footer: React.FC = () => {
                   Galeri
                 </Link>
               </li>
-              {/* <li>
+              <li>
                 <Link
                   to="/berita"
                   className="text-gray-300 hover:text-yellow-500 transition-colors"
                 >
                   Berita
                 </Link>
-              </li> */}
+              </li>
               <li>
                 <Link
                   to="/kontak"
