@@ -3,6 +3,8 @@ import contact_profile from './contact_profile'
 import dashboard from './dashboard'
 import gallery from './gallery'
 import post from './post'
+import postAuthor from './postAuthor'
+import postCategory from './postCategory'
 import program from './program'
 import donation from './donation'
 import donation_record from './donationRecord'
@@ -12,6 +14,8 @@ export const schemaTypes = [
   contact_profile,
   dashboard,
   gallery,
+  postAuthor,
+  postCategory,
   post,
   program,
   donation,

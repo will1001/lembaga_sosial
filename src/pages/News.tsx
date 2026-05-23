@@ -39,6 +39,8 @@ const News: React.FC = () => {
       .fetch<NewsArticle[]>(
         `*[_type == "post"] | order(coalesce(date, _createdAt) desc) {
           ...,
+          "author": coalesce(author_ref->name, author),
+          "category": coalesce(category_ref->title, category),
           "publishedDate": coalesce(date, _createdAt)
         }`
       )

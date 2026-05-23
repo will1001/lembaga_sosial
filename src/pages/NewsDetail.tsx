@@ -42,6 +42,8 @@ const NewsDetail: React.FC = () => {
       .fetch<NewsPost | null>(
         `*[_type == "post" && (slug.current == $slug || _id == $slug)][0] {
           ...,
+          "author": coalesce(author_ref->name, author),
+          "category": coalesce(category_ref->title, category),
           "publishedDate": coalesce(date, _createdAt)
         }`,
         {slug}

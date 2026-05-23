@@ -80,14 +80,28 @@ export default defineType({
       }
     }),
     defineField({
-      name: 'author',
+      name: 'author_ref',
       title: 'Author',
+      type: 'reference',
+      to: [{type: 'postAuthor'}],
+    }),
+    defineField({
+      name: 'category_ref',
+      title: 'Category',
+      type: 'reference',
+      to: [{type: 'postCategory'}],
+    }),
+    defineField({
+      name: 'author',
+      title: 'Legacy Author',
       type: 'string',
+      hidden: true,
     }),
     defineField({
       name: 'category',
-      title: 'Category',
+      title: 'Legacy Category',
       type: 'string',
+      hidden: true,
     }),
     defineField({
       name: 'image',
