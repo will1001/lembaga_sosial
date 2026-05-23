@@ -82,11 +82,11 @@ const NewsDetail: React.FC = () => {
     <div className="bg-white pt-24">
       <article>
         {post.image && (
-          <div className="h-[360px] overflow-hidden md:h-[480px]">
+          <div className="bg-gray-100">
             <img
-              src={urlFor(post.image).width(1600).height(700).fit('crop').url()}
+              src={urlFor(post.image).width(1600).auto('format').url()}
               alt={post.title}
-              className="h-full w-full object-cover"
+              className="mx-auto h-auto max-h-[720px] w-full object-contain"
             />
           </div>
         )}
