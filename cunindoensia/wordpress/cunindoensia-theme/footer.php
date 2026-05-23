@@ -39,6 +39,7 @@ $contact = cun_contact();
                 <li><a href="<?php echo esc_url(home_url('/#tentang')); ?>">Tentang Kami</a></li>
                 <li><a href="<?php echo esc_url(home_url('/program/')); ?>">Program</a></li>
                 <li><a href="<?php echo esc_url(home_url('/galeri/')); ?>">Galeri</a></li>
+                <li><a href="<?php echo esc_url(cun_news_url()); ?>">Berita</a></li>
                 <li><a href="<?php echo esc_url(home_url('/donasi/')); ?>">Donasi</a></li>
             </ul>
         </section>

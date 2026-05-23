@@ -33,6 +33,7 @@ $is_home = is_front_page();
             <a href="<?php echo esc_url(home_url('/#tentang')); ?>">Tentang Kami</a>
             <a href="<?php echo esc_url(home_url('/program/')); ?>" class="<?php echo is_post_type_archive('program') ? 'current' : ''; ?>">Program</a>
             <a href="<?php echo esc_url(home_url('/galeri/')); ?>" class="<?php echo is_post_type_archive('gallery') ? 'current' : ''; ?>">Galeri</a>
+            <a href="<?php echo esc_url(cun_news_url()); ?>" class="<?php echo (cun_is_news_index() || is_singular('post')) ? 'current' : ''; ?>">Berita</a>
             <a href="<?php echo esc_url(home_url('/#kontak')); ?>">Kontak</a>
             <a class="btn btn-primary" href="<?php echo esc_url(home_url('/donasi/')); ?>">
                 <?php echo cun_icon('heart'); ?>

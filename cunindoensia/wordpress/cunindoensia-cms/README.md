@@ -68,6 +68,18 @@ Untuk tampilan landing page, gunakan theme `wordpress/cunindoensia-theme`.
 - Gambar: featured image
 - Kategori: taxonomy `gallery_category`
 
+### Post / Berita
+
+- Judul: post title
+- Slug: WordPress slug
+- Excerpt: ringkasan kartu berita
+- Content: editor WordPress / Gutenberg
+- Featured image: gambar utama
+- Publish Date: tanggal publish WordPress
+- Author: user author WordPress
+- Category: kategori bawaan WordPress
+- Featured: `_cun_post_featured`
+
 ## REST API
 
 Plugin ini mengaktifkan `show_in_rest`, jadi data bisa diambil dari:

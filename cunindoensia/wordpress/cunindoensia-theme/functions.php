@@ -17,10 +17,24 @@ add_action('after_setup_theme', 'cun_theme_setup');
 
 function cun_theme_assets(): void
 {
-    wp_enqueue_style('cunindoensia-style', get_stylesheet_uri(), [], '1.0.0');
-    wp_enqueue_script('cunindoensia-main', get_template_directory_uri() . '/assets/js/main.js', [], '1.0.0', true);
+    wp_enqueue_style('cunindoensia-style', get_stylesheet_uri(), [], '1.0.1');
+    wp_enqueue_script('cunindoensia-main', get_template_directory_uri() . '/assets/js/main.js', [], '1.0.1', true);
 }
 add_action('wp_enqueue_scripts', 'cun_theme_assets');
+
+function cun_news_rewrite_rules(): void
+{
+    add_rewrite_rule('^berita/?$', 'index.php?post_type=post', 'top');
+    add_rewrite_rule('^berita/([^/]+)/?$', 'index.php?name=$matches[1]', 'top');
+}
+add_action('init', 'cun_news_rewrite_rules');
+
+function cun_flush_rewrite_rules(): void
+{
+    cun_news_rewrite_rules();
+    flush_rewrite_rules();
+}
+add_action('after_switch_theme', 'cun_flush_rewrite_rules');
 
 function cun_asset(string $path): string
 {
@@ -71,6 +85,45 @@ function cun_post_image_url(int $post_id, string $size = 'large', string $fallba
     }
 
     return $fallback;
+}
+
+function cun_news_url(): string
+{
+    $posts_page_id = (int) get_option('page_for_posts');
+
+    if ($posts_page_id) {
+        return get_permalink($posts_page_id);
+    }
+
+    return home_url('/berita/');
+}
+
+function cun_is_news_index(): bool
+{
+    return is_home() || (!is_singular() && get_query_var('post_type') === 'post');
+}
+
+function cun_news_permalink(int $post_id = 0): string
+{
+    $post_id = $post_id ?: get_the_ID();
+    $post = get_post($post_id);
+
+    if (!$post instanceof WP_Post || $post->post_type !== 'post') {
+        return get_permalink($post_id);
+    }
+
+    return home_url('/berita/' . $post->post_name . '/');
+}
+
+function cun_post_category_label(int $post_id = 0): string
+{
+    $categories = get_the_category($post_id ?: get_the_ID());
+
+    if (empty($categories) || is_wp_error($categories)) {
+        return '';
+    }
+
+    return $categories[0]->name;
 }
 
 function cun_currency($amount): string

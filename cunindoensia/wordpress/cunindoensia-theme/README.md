@@ -15,6 +15,8 @@ Theme WordPress ini membuat landing page seperti versi Vite/Bolt di repo parent.
 - Archive `/program/`
 - Archive `/donasi/`
 - Archive `/galeri/`
+- Halaman berita `/berita/`
+- Detail berita `/berita/{slug}/`
 - Detail donasi
 
 ## Cara Pasang
@@ -35,6 +37,17 @@ Theme membaca data dari plugin:
 - CPT `program`
 - CPT `donation`
 - CPT `gallery`
+- WordPress Post bawaan untuk berita
+
+Untuk berita:
+
+- Judul: post title
+- Ringkasan: excerpt
+- Konten lengkap: editor WordPress
+- Gambar: featured image
+- Author: WordPress author
+- Kategori: WordPress category
+- Featured: meta `Featured?` dari plugin `Cunindoensia CMS`
 
 Jika belum ada data di WordPress, theme tetap tampil dengan gambar dan teks fallback.
 
@@ -44,3 +57,5 @@ Jika belum ada data di WordPress, theme tetap tampil dengan gambar dan teks fall
 - `/program/` daftar program
 - `/donasi/` daftar donasi
 - `/galeri/` daftar galeri
+- `/berita/` daftar berita
+- `/berita/{slug}/` detail berita

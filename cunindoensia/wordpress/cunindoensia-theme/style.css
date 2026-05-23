@@ -3,7 +3,7 @@ Theme Name: Cunindoensia Landing
 Theme URI: https://example.com/cunindoensia
 Author: Cunindoensia
 Description: WordPress landing page theme for Cunindoensia, adapted from the Vite/Bolt design.
-Version: 1.0.0
+Version: 1.0.1
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
@@ -433,6 +433,42 @@ img {
   color: var(--color-gray-700);
 }
 
+.card-link-wrap {
+  display: block;
+  height: 100%;
+}
+
+.clamp-5 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+.news-grid .content-card {
+  max-width: 640px;
+}
+
+.news-badge {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: #854d0e;
+  background: #fef9c3;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 16px;
+  color: var(--color-gray-600);
+  font-size: 0.92rem;
+}
+
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -555,6 +591,49 @@ img {
 .single-content {
   color: var(--color-gray-700);
   font-size: 1.05rem;
+}
+
+.single-narrow {
+  max-width: 900px;
+}
+
+.news-detail {
+  padding-top: 88px;
+}
+
+.news-hero-image {
+  width: 100%;
+  height: min(480px, 55vw);
+  min-height: 320px;
+  overflow: hidden;
+}
+
+.news-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.single-meta {
+  margin: 18px 0 0;
+}
+
+.single-excerpt {
+  margin: 32px 0;
+  color: var(--color-gray-700);
+  font-size: 1.22rem;
+  line-height: 1.7;
+}
+
+.single-content h2,
+.single-content h3 {
+  color: var(--color-gray-900);
+  line-height: 1.2;
+}
+
+.single-content a {
+  color: var(--color-yellow-dark);
+  font-weight: 700;
 }
 
 .side-panel {
