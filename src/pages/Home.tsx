@@ -26,13 +26,23 @@ type Program = {
   desc?: string;
 };
 
+const homeImageCacheKey = "cun-home-image-url";
+
+const getCachedHomeImageUrl = () => {
+  if (typeof window === "undefined") return undefined;
+  return window.localStorage.getItem(homeImageCacheKey) || undefined;
+};
+
 const Home: React.FC = () => {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [program, setProgram] = useState<Program[]>([]);
+  const [cachedHomeImageUrl, setCachedHomeImageUrl] = useState(
+    getCachedHomeImageUrl
+  );
 
   const homeImageUrl = dashboard?.home_image
     ? urlFor(dashboard.home_image).width(1600).auto("format").url()
-    : undefined;
+    : cachedHomeImageUrl;
 
   useEffect(() => {
     sanity
@@ -41,6 +51,16 @@ const Home: React.FC = () => {
       )
       .then((data) => {
         if (data) {
+          if (data.home_image) {
+            const nextHomeImageUrl = urlFor(data.home_image)
+              .width(1600)
+              .auto("format")
+              .url();
+
+            window.localStorage.setItem(homeImageCacheKey, nextHomeImageUrl);
+            setCachedHomeImageUrl(nextHomeImageUrl);
+          }
+
           setDashboard(data);
         }
       });
