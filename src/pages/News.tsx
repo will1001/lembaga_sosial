@@ -10,19 +10,24 @@ interface NewsArticle {
   slug?: { current?: string };
   title: string;
   excerpt: string;
-  date: string;
+  publishedDate: string;
   author: string;
   category: string;
   image?: SanityImageSource;
   featured?: boolean;
 }
 
-const formatDate = (date: string) =>
-  new Date(date).toLocaleDateString('id-ID', {
+const formatDate = (date: string) => {
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) return '';
+
+  return parsedDate.toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+};
 
 const News: React.FC = () => {
   const [posts, setPosts] = useState<NewsArticle[]>([]);
@@ -31,7 +36,12 @@ const News: React.FC = () => {
 
   useEffect(() => {
     sanity
-      .fetch<NewsArticle[]>(`*[_type == "post"] | order(date desc, _updatedAt desc)`)
+      .fetch<NewsArticle[]>(
+        `*[_type == "post"] | order(coalesce(date, _createdAt) desc) {
+          ...,
+          "publishedDate": coalesce(date, _createdAt)
+        }`
+      )
       .then(setPosts);
   }, []);
 
@@ -155,7 +165,9 @@ const News: React.FC = () => {
                   <p className="text-gray-700 mb-6">{featuredArticle.excerpt}</p>
                   <div className="flex items-center text-gray-500 text-sm mb-6">
                     <Calendar size={16} className="mr-1" />
-                    <span className="mr-4">{formatDate(featuredArticle.date)}</span>
+                    <span className="mr-4">
+                      {formatDate(featuredArticle.publishedDate)}
+                    </span>
                     <User size={16} className="mr-1" />
                     <span>{featuredArticle.author}</span>
                   </div>
@@ -208,7 +220,9 @@ const News: React.FC = () => {
                     <p className="text-gray-700 mb-4">{article.excerpt}</p>
                     <div className="flex items-center text-gray-500 text-sm mb-4">
                       <Calendar size={16} className="mr-1" />
-                      <span className="mr-4">{formatDate(article.date)}</span>
+                      <span className="mr-4">
+                        {formatDate(article.publishedDate)}
+                      </span>
                       <User size={16} className="mr-1" />
                       <span>{article.author}</span>
                     </div>

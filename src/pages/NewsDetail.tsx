@@ -10,7 +10,7 @@ type NewsPost = {
   _id: string;
   title: string;
   excerpt?: string;
-  date?: string;
+  publishedDate?: string;
   author?: string;
   category?: string;
   image?: SanityImageSource;
@@ -19,8 +19,11 @@ type NewsPost = {
 
 const formatDate = (date?: string) => {
   if (!date) return '';
+  const parsedDate = new Date(date);
 
-  return new Date(date).toLocaleDateString('id-ID', {
+  if (Number.isNaN(parsedDate.getTime())) return '';
+
+  return parsedDate.toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -37,7 +40,10 @@ const NewsDetail: React.FC = () => {
 
     sanity
       .fetch<NewsPost | null>(
-        `*[_type == "post" && (slug.current == $slug || _id == $slug)][0]`,
+        `*[_type == "post" && (slug.current == $slug || _id == $slug)][0] {
+          ...,
+          "publishedDate": coalesce(date, _createdAt)
+        }`,
         {slug}
       )
       .then(setPost)
@@ -93,10 +99,10 @@ const NewsDetail: React.FC = () => {
             {post.title}
           </h1>
           <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-gray-500">
-            {post.date && (
+            {post.publishedDate && (
               <span className="inline-flex items-center">
                 <Calendar size={16} className="mr-1" />
-                {formatDate(post.date)}
+                {formatDate(post.publishedDate)}
               </span>
             )}
             {post.author && (

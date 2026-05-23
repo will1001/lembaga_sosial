@@ -74,6 +74,7 @@ export default defineType({
       name: 'date',
       title: 'Publish Date',
       type: 'date',
+      initialValue: () => new Date().toISOString().slice(0, 10),
       options: {
         dateFormat: 'DD MMMM YYYY',
       }
